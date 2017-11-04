@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "outDir": "./lib",
+        "jsx": "react",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "./lib"
+    },
+    "exclude": [
+        "node_modules",
+        "lib"
+    ]
+}

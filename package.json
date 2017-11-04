@@ -1,0 +1,38 @@
+{
+  "name": "crx-bridge",
+  "version": "0.0.0",
+  "description": "Messaging in Chrome extensions made easy. Out of the box.",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chipto/crx-bridge.git"
+  },
+  "keywords": [
+    "chrome",
+    "extension",
+    "messaging",
+    "communication",
+    "protocol",
+    "content",
+    "background",
+    "devtools",
+    "script",
+    "crx",
+    "bridge"
+  ],
+  "author": "Neek Sandhu <neek.sandhu@chipto.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chipto/crx-bridge/issues"
+  },
+  "homepage": "https://github.com/chipto/crx-bridge#readme",
+  "devDependencies": {
+    "@types/chrome": "0.0.50",
+    "@types/node": "^8.0.46",
+    "typescript": "^2.5.3"
+  }
+}
