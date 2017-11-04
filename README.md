@@ -61,6 +61,7 @@ Bridge.onMessage('do-stuff', (message) => {
  - [Troubleshooting](#troubleshooting)
 
 <a name="setup"></a>
+
 # Setup
 
 ### Install
@@ -79,6 +80,7 @@ Just `import Bridge from 'crx-bridge'` wherever you need it and use as shown in 
 
 
 <a name="api"></a>
+
 # API
 
 
@@ -218,6 +220,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 ```
 
 <a name="behaviour"></a>
+
 # Behaviour
 
 > Following rules apply to destination being specified in `Bridge.sendMessage(msgId, data, destination)` and `Bridge.openStream(channelId, initialData, destination)`
@@ -235,6 +238,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
  - Specifying `devtools` or `content-script` or `window` from `background` will throw an error. When calling from `background`, destination must be suffixed with tab id. Like `devtools@745` for `devtools` inspecting tab id 745 or `content-script@351` for top `content-script` at tab id 351.
 
 <a name="security"></a>
+
  # Serious security note
 
  The following note only applies if and only if, you will be sending/receiving messages to/from `window` or `frame` contexts. There's no security concern if you will be only working with `content-script`, `background` or `devtools` scope.
@@ -264,6 +268,7 @@ Bridge.onMessage('getUserBrowsingHistory', (message) => {
 <br> Alternatively use `sender.isReallyInternal()` to return `false` in such cases.
 
 <a name="troubleshooting"></a>
+
 # Troubleshooting
 
  - Doesn't work?
