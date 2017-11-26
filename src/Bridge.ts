@@ -248,8 +248,15 @@ class Bridge {
         }
         message.hops.push(Bridge.id);
         if (Bridge.context === RuntimeContext.ContentScript
-            && !Bridge.isExternalMessagingEnabled
-            && /window|frame/.test(message.destination + origin)) {
+            && /window/.test(message.destination + origin)
+            && !Bridge.allowWindowMessaging
+            && !Bridge.isExternalMessagingEnabled) {
+            return;
+        }
+        // Deprecated, remove in upcoming release
+        if (Bridge.context === RuntimeContext.ContentScript
+            && /frame/.test(message.destination + origin)
+            && !Bridge.isExternalMessagingEnabled) {
             return;
         }
         if (!Bridge.rootContext) {
