@@ -50,14 +50,15 @@ class Bridge {
     private static id: string = null;
     private static rootContext: RuntimeContext = null;
     private static context: RuntimeContext =
-    (chrome.devtools) ? RuntimeContext.Devtools
-        : (chrome.tabs) ? RuntimeContext.Background
-            : (chrome.extension) ? RuntimeContext.ContentScript
-                : (typeof document === 'undefined' && typeof importScripts === 'function') ? RuntimeContext.Worker
-                    : (typeof document !== 'undefined' && window.top !== window) ? RuntimeContext.Frame
-                        : (typeof document !== 'undefined') ? RuntimeContext.Window : null;
+        (chrome.devtools) ? RuntimeContext.Devtools
+            : (chrome.tabs) ? RuntimeContext.Background
+                : (chrome.extension) ? RuntimeContext.ContentScript
+                    : (typeof document === 'undefined' && typeof importScripts === 'function') ? RuntimeContext.Worker
+                        : (typeof document !== 'undefined' && window.top !== window) ? RuntimeContext.Frame
+                            : (typeof document !== 'undefined') ? RuntimeContext.Window : null;
     private static namespace: string;
     private static isExternalMessagingEnabled = false;
+    private static isWindowMessagingAllowed: boolean;
     private static linkedNodesCache = {};
     private static isInitialized = false;
     private static openTransactions: Map<string, any> = new Map();
@@ -124,7 +125,13 @@ class Bridge {
     }
 
     public static enableExternalMessaging = (nsps: string) => {
+        console.warn('External messaging is now deprecated due to added complexity and not so many use cases, use `allowWindowMessaging(nsps: string)` instead');
         Bridge.isExternalMessagingEnabled = true;
+        Bridge.namespace = nsps;
+    }
+
+    public static allowWindowMessaging = (nsps: string) => {
+        Bridge.isWindowMessagingAllowed = true;
         Bridge.namespace = nsps;
     }
 
@@ -193,6 +200,11 @@ class Bridge {
             }
             const port: MessagePort = ports[0];
             port.postMessage(type);
+            return;
+        }
+        if (data.cmd === '__crx_bridge_verify_listening' && data.scope === Bridge.namespace) {
+            const port: MessagePort = ports[0];
+            port.postMessage(true);
             return;
         }
         if (!Bridge.rootContext) {
@@ -369,11 +381,20 @@ class Bridge {
 
     private static winRouteMsg(win: Window, msg: IInternalMessage) {
         Bridge.ensureNamespace();
-        win.postMessage({
-            cmd: '__crx_bridge_route_message',
-            scope: Bridge.namespace,
-            payload: msg,
-        }, '*');
+        const channel = new MessageChannel();
+        const retry = setTimeout(() => {
+            channel.port1.onmessage = null;
+            Bridge.winRouteMsg(win, msg);
+        }, 300);
+        channel.port1.onmessage = (ev: MessageEvent) => {
+            clearTimeout(retry);
+            win.postMessage({
+                cmd: '__crx_bridge_route_message',
+                scope: Bridge.namespace,
+                payload: msg,
+            }, '*');
+        };
+        win.postMessage({ cmd: '__crx_bridge_verify_listening', scope: Bridge.namespace }, '*', [channel.port2]);
     }
 }
 Bridge.init();

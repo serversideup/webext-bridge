@@ -17,6 +17,7 @@ declare class Bridge {
     private static context;
     private static namespace;
     private static isExternalMessagingEnabled;
+    private static isWindowMessagingAllowed;
     private static linkedNodesCache;
     private static isInitialized;
     private static openTransactions;
@@ -39,6 +40,7 @@ declare class Bridge {
     static onMessage(messageID: string, callback: OnMessageCallback): void;
     static setNamespace: (nsps: string) => void;
     static enableExternalMessaging: (nsps: string) => void;
+    static allowWindowMessaging: (nsps: string) => void;
     static init(): void;
     private static handleWindowOnMessage;
     /**
