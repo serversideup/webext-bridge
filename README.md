@@ -103,18 +103,17 @@ Any value you want to pass to other side, latter can access this value by referi
 > Required | `string`
 
 The actual identifier of other endpoint.
-Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453` or `content-script@13:frame#2`
+Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453`
 
 Structure:
  - Must begin with known roots - `background` or `content-script` or `devtools` or `window`
- - `content-script`, `window` and `devtools` roots can be followed by `frame`(s), separated by `':'`, like `content-script:frame#3` (here #3 means third frame from top (zero-index based))
- - Known root can only occur once or put another way, applicable roots can only be followed by `frame`(s), separated by `:`
- - `frame`(s) can be followed by `frame`(s), like `content-script@14:frame:frame#2`
+ - `devtools` roots can be followed by `frame`(s), separated by `':'`, like `devtools:frame#3` (here #3 means third frame from top (zero-index based))
+ - Known root can only occur once or put another way, `content-script:devtools`, `devtools:devtoolssss` etc are invalid
  - `content-script`, `window` and `devtools` roots can be suffixed with `@tabId` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
 
  Read `Behaviour` section to see how destinations (or endpoints) are treated.
 
- > Note: For security reasons, if you want to receive or send messages to or from `window` root context or any `frame` context, one of your extension's content script must call `Bridge.enableExternalMessaging(<namespace: string>)` to unlock message routing. Also call `Bridge.setNamespace(<namespace: string>)` in those `window` or `frame` contexts. Use same namespace string in those two calls, so `crx-bridge` knows which message belongs to which extension (in case multiple extensions are using `crx-bride` in one page)
+ > Note: For security reasons, if you want to receive or send messages to or from `window` root context, one of your extension's content script must call `Bridge.allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `Bridge.setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `crx-bridge` knows which message belongs to which extension (in case multiple extensions are using `crx-bride` in one page)
 
 ___
 
@@ -139,17 +138,17 @@ Read [security note](#security) before using this.
 
 ___
 
- ## `Bridge.enableExternalMessaging(namespace: string)`
+ ## `Bridge.allowWindowMessaging(namespace: string)`
 > Caution: Dangerous action
 
 Applicable to content scripts (noop if called from anywhere else)
 
-Unlocks the transmission of messages to and from `window` and `frame` contexts in the tab where it is called.
-`crx-bridge` by default won't transmit any payload to or from `window` and `frame` contexts for security reasons.
+Unlocks the transmission of messages to and from `window` (top frame of loaded page) contexts in the tab where it is called.
+`crx-bridge` by default won't transmit any payload to or from `window` contexts for security reasons.
 This method can be called from a content script (in top frame of tab), which opens a gateway for messages.
 
-`window` = the top frame of any tab
-`frame`(s) = sub-frames as iframes of `window` or `frame`(s)
+Once again, `window` = the top frame of any tab. That means __allowing window messaging without checking origin first__ will let JavaScript loaded at `https://evil.com` talk with your extension and possibly give indirect access to things you won't want to like `history` API. You're expected to ensure the
+safety and privacy of your extension's users.
 
 #### `namespace`
 > Required | `string`
@@ -161,9 +160,9 @@ ___
 
  ## `Bridge.setNamespace(namespace: string)`
 
-Applicable to scripts in regular web pages.
+Applicable to scripts in top frame of loaded remote page
 
-Sets the namespace `Bridge` should use when relaying messages to and from `window` or `frame`(s). In a sense, it connects the callee context to the extension which called `Bridge.enableExternalMessaging(<namespace: string>)` in it's content script with same namespace.
+Sets the namespace `Bridge` should use when relaying messages to and from `window` context. In a sense, it connects the callee context to the extension which called `Bridge.allowWindowMessaging(<namespace: string>)` in it's content script with same namespace.
 
 #### `namespace`
 > Required | `string`
@@ -172,7 +171,7 @@ Can be a domain name reversed like `com.github.facebook.react_devtools` or any `
 
 ## Extras
 
-The following API is built on top of `Bridge.sendMessage` and `Bridge.onMessage`, in other words, it's just a wrapper, the routing and security rules still apply the same way.
+The following API is built on top of `Bridge.sendMessage` and `Bridge.onMessage`, basically, it's just a wrapper, the routing and security rules still apply the same way.
 
 ### `Bridge.openStream(channel: string, destination: string)`
 
@@ -208,7 +207,7 @@ Only one listener per channel per context
 
 Callback that should be called whenever `Stream` is opened from the other side. Callback will be called with one argument, the `Stream` object, documented below.
 
-`Stream`(s) can be opened by a malicious webpage(s) if a tab's content script has called `Bridge.enableExternalMessaging`, if working with sensitive information use `stream.info.endpoint.isInternal()` to check, if `false` call `stream.close()` immediately.
+`Stream`(s) can be opened by a malicious webpage(s) if a tab's content script has called `Bridge.allowWindowMessaging`, if working with sensitive information use `stream.info.endpoint.isInternal()` to check, if `false` call `stream.close()` immediately.
 
 ### Stream Example
 
@@ -223,17 +222,15 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 # Behaviour
 
-> Following rules apply to destination being specified in `Bridge.sendMessage(msgId, data, destination)` and `Bridge.openStream(channelId, initialData, destination)`
+> Following rules apply to `destination` being specified in `Bridge.sendMessage(msgId, data, destination)` and `Bridge.openStream(channelId, initialData, destination)`
 
  - Specifying `devtools` as destination from `content-script` will auto-route payload to  inspecting `devtools` page if open and listening.
 
  - Specifying `content-script` as destination from `devtools` will auto-route the message to  inspected window's top `content-script` page if listening. If page is loading, message will be queued up and deliverd when page is ready and listening.
 
- - If `frame` or `window` (which could be a script injected by content script) are source or destination of any payload, transmission must be first unlocked by calling `Bridge.enableExternalMessagin(<namespace: string>)` inside a content script, since `Bridge` will first deliver the payload to `content-script` using rules above, and latter will take over and forward accordingly. `content-script` <-> `window`, `window` <-> `frame`, `frame` <-> `frame` and `content-script` <-> `frame` messaging happens using `window.postMessage` API. Therefore to avoid conflicts, `Bridge` requires you to call `Bridge.setNamespace(uuidOrReverseDomain)` inside `window` and `frame` contexts (even if they are just relaying a payload across), before routing occurs.
+ - If `window` context (which could be a baby of script injected by content script) are source or destination of any payload, transmission must be first unlocked by calling `Bridge.allowWindowMessaging(<namespace: string>)` inside a that page's top content script, since `Bridge` will first deliver the payload to `content-script` using rules above, and latter will take over and forward accordingly. `content-script` <-> `window` messaging happens using `window.postMessage` API. Therefore to avoid conflicts, `Bridge` requires you to call `Bridge.setNamespace(uuidOrReverseDomain)` inside `window` the said window script (injected or remote, doesn't matter).
 
- - The rule above does not apply to `frame`(s) inside `devtools`. Bridge assumes that everything you load up in devtools panel is all under your ownership and control. However in a tab, there might be other extensions using `crx-bridge`. Calling `Bridge.sendMessage(msgId, data, 'devtools:frame#1:frame')` from `content-script` will work out of the box.
-
- - Routing to and from `window` or `frame` contexts will only work if there is content script loaded in top frame of the page. The same page which hosts those `window` or `frame`(s). The content script must also have `crx-bridge` imported and a call to `Bridge.enableExternalMessagin(<namespace: string>)`
+ - Bridge assumes that everything you load up in devtools panel is all under your ownership and control. Thus calling `Bridge.sendMessage(msgId, data, 'devtools:frame#1:frame')` from `content-script` will work out of the box (no conflict checks are done, because of ownership assumption)
 
  - Specifying `devtools` or `content-script` or `window` from `background` will throw an error. When calling from `background`, destination must be suffixed with tab id. Like `devtools@745` for `devtools` inspecting tab id 745 or `content-script@351` for top `content-script` at tab id 351.
 
@@ -241,13 +238,15 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
  # Serious security note
 
- The following note only applies if and only if, you will be sending/receiving messages to/from `window` or `frame` contexts. There's no security concern if you will be only working with `content-script`, `background` or `devtools` scope.
+ The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background` or `devtools` scope, which is default setting.
 
- `window` and `frame` contexts get unlocked the moment you call `Bridge.enableExternalMessaging(namespace)` somewhere in your extenion's content script(s).
+ `window` context(s) in tab `A` get unlocked the moment you call `Bridge.allowWindowMessaging(namespace)` somewhere in your extenion's content script(s) that's also loaded in tab `A`.
 
  Unlike `chrome.runtime.sendMessage` and `chrome.runtime.connect`, which requires extension's manifest to specify sites allowed to talk with the extension, `crx-bridge` has no such measure by design, which means any webpage whether you intended or not, can do `Bridge.sendMessage(msgId, data, 'background')` or something similar that produces same effect, as long as it uses same protocol used by `crx-bridge` and namespace set to same as yours.
 
  So to be safe, if you will be interacting with `window` or `frame` contexts, treat `crx-bridge` as you would treat `window.postMessage` API.
+
+ Before you call `Bridge.allowWindowMessaging`, check if that page's `window.location.origin` is something you expect already.
 
  As an example if you plan on having something critical, **always** verify the `sender` before responding:
 
@@ -272,7 +271,7 @@ Bridge.onMessage('getUserBrowsingHistory', (message) => {
 # Troubleshooting
 
  - Doesn't work?
- <br>If `window` and `frame` contexts are not part of the puzzle, `crx-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `crx-bridge` hasn't been loaded in background page of your extension, which is used by `crx-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `crx-bridge` going.
+ <br>If `window` contexts are not part of the puzzle, `crx-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `crx-bridge` hasn't been loaded in background page of your extension, which is used by `crx-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `crx-bridge` going.
  ```javascript
  // background.js (requires transpilation/bundling using webpack(recommended))
  import 'crx-bridge';
@@ -288,4 +287,6 @@ Bridge.onMessage('getUserBrowsingHistory', (message) => {
  ```
 
  - Can't send messages to `window`?
- <br>Sending or receiving messages from or to `window` (and `frame`(s)) requires you to open the messaging gateway in content script(s) for that particular tab. Call `Bridge.enableExternalMessaging(<namespaceA: string>)` in any of your content script(s) and call `Bridge.setNamespace(<namespaceB: string>)` in webpage or `window` context. Make sure that `namespaceA === namespaceB`. If you're doing this, read the [security note above](#security)
+ <br>Sending or receiving messages from or to `window` requires you to open the messaging gateway in content script(s) for that particular tab. Call `Bridge.allowWindowMessaging(<namespaceA: string>)` in any of your content script(s) in that tab and call `Bridge.setNamespace(<namespaceB: string>)` in the
+ script loaded in top frame i.e the `window` context. Make sure that `namespaceA === namespaceB`. If you're doing this, read the [security note above](#security)
+ 
