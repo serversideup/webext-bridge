@@ -2,11 +2,11 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "outDir": "./lib",
+        "outDir": "./dist",
         "jsx": "react",
         "sourceMap": true,
         "declaration": true,
-        "declarationDir": "./lib"
+        "declarationDir": "./dist"
     },
     "exclude": [
         "node_modules",
