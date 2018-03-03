@@ -35,5 +35,8 @@
     "@types/chrome": "0.0.50",
     "@types/node": "^8.0.46",
     "typescript": "^2.5.3"
+  },
+  "dependencies": {
+    "serialize-error": "^2.1.0"
   }
 }
