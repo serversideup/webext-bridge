@@ -13,7 +13,7 @@ class BridgePlus extends Bridge {
      */
     public static init() {
         super.init();
-        this.onMessage('__stream_opened', (message) => {
+        this.onMessage('__crx_bridge_stream_open__', (message) => {
             return new Promise((resolve) => {
                 const { sender, data } = message;
                 const { channel } = data;
@@ -21,7 +21,7 @@ class BridgePlus extends Bridge {
                 const readyup = () => {
                     const callback = this.onOpenStreamCallbacks.get(channel);
                     if (typeof callback === 'function') {
-                        callback(new Stream({ ...data, destination: sender.path }));
+                        callback(new Stream({ ...data, endpoint: sender }));
                         if (watching) {
                             this.streamyEmitter.removeListener('did-change-stream-callbacks', readyup);
                         }
@@ -51,14 +51,14 @@ class BridgePlus extends Bridge {
         const streamInfo = {
             streamId: uuid(),
             channel,
-            destination,
+            endpoint: destination,
         };
 
         const stream = new Stream(streamInfo);
         stream.onClose(() => {
             this.openStreams.delete(channel);
         });
-        await this.sendMessage('__stream_opened', streamInfo, destination);
+        await this.sendMessage('__crx_bridge_stream_open__', streamInfo, destination);
         this.openStreams.set(channel, stream);
         return stream;
     }

@@ -2,14 +2,10 @@ import { EventEmitter } from 'events';
 import { Bridge } from './Bridge';
 import { Endpoint } from './Endpoint';
 
-export interface IStreamAttributes {
+export interface IStreamInfo {
     streamId: string;
     channel: string;
-    destination: string;
-}
-
-export interface IStreamInfo {
-    endpoint: Endpoint;
+    endpoint: Endpoint | string;
 }
 
 /**
@@ -19,25 +15,46 @@ export interface IStreamInfo {
  * conflicting messageId's, since streams are strictly scoped.
  */
 class Stream {
-    private internalInfo: IStreamAttributes;
+    private static initDone: boolean = false
+    private static openStreams: Map<string, Stream> = new Map();
+
+    private internalInfo: IStreamInfo;
     private emitter: EventEmitter;
     private isClosed: boolean;
-    constructor(t: IStreamAttributes) {
+    constructor(t: IStreamInfo) {
+        if (typeof t.endpoint === 'string') {
+            t.endpoint = new Endpoint(t.endpoint)
+        }
         this.internalInfo = t;
         this.emitter = new EventEmitter();
         this.isClosed = false;
-        const { streamId } = t;
-        Bridge.onMessage(`__stream_transfer__${streamId}`, this.handleStreamTransfer);
-        Bridge.onMessage(`__stream_close__${streamId}`, this.handleStreamClose);
+
+        if (!Stream.initDone) {
+            Bridge.onMessage(`__crx_bridge_stream_transfer__`, (msg) => {
+                const { streamId, streamTransfer, action } = msg.data;
+                const stream = Stream.openStreams.get(streamId)
+                if (stream && !stream.isClosed) {
+                    if (action === 'transfer') {
+                        stream.emitter.emit('message', streamTransfer);
+                    }
+
+                    if (action === 'close') {
+                        Stream.openStreams.delete(streamId)
+                        stream.handleStreamClose()
+                    }
+                }
+            });
+            Stream.initDone = true
+        }
+
+        Stream.openStreams.set(t.streamId, this)
     }
 
     /**
      * Returns stream info
      */
     public get info(): IStreamInfo {
-        return {
-            endpoint: new Endpoint(this.internalInfo.destination),
-        };
+        return this.internalInfo;
     }
 
     /**
@@ -52,7 +69,11 @@ class Stream {
         if (this.isClosed) {
             throw new Error('Attempting to send a message over closed stream. Use stream.onClose(<callback>) to keep an eye on stream status');
         }
-        Bridge.sendMessage(`__stream_transfer__${this.internalInfo.streamId}`, msg, this.internalInfo.destination);
+        Bridge.sendMessage(`__crx_bridge_stream_transfer__`, {
+            streamId: this.internalInfo.streamId,
+            streamTransfer: msg,
+            action: 'transfer',
+        }, this.internalInfo.endpoint)
     }
 
     /**
@@ -66,7 +87,11 @@ class Stream {
             this.send(msg);
         }
         this.handleStreamClose();
-        Bridge.sendMessage(`__stream_close__${this.internalInfo.streamId}`, true, this.internalInfo.destination);
+        Bridge.sendMessage(`__crx_bridge_stream_transfer__`, {
+            streamId: this.internalInfo.streamId,
+            streamTransfer: null,
+            action: 'close',
+        }, this.internalInfo.endpoint)
     }
 
     /**
@@ -83,10 +108,6 @@ class Stream {
      */
     public onClose(callback) {
         return this.getDisposable('closed', callback);
-    }
-
-    private handleStreamTransfer = (message) => {
-        this.emitter.emit('message', message.data);
     }
 
     private handleStreamClose = () => {
