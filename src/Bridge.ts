@@ -2,6 +2,8 @@ import { EventEmitter } from "events";
 import { Endpoint } from "./Endpoint";
 import { uuid } from "./utils";
 
+import * as serializeError from 'serialize-error'
+
 export type OnMessageCallback = (message: IBridgeMessage) => void | any | Promise<any>;
 
 export interface IBridgeMessage {
@@ -14,14 +16,11 @@ export interface IBridgeMessage {
 interface IInternalMessage {
     origin: string;
     destination: string;
-    path: string[];
     transactionId: string;
-    /**
-     * Track packet's journey, as well as cache path to take given a destination/path we've been before
-     */
     hops: string[];
     messageID: string;
     messageType: 'message' | 'reply';
+    err?: any;
     data: any;
     timestamp: number;
 }
@@ -40,7 +39,7 @@ enum RuntimeContext {
     Worker,
 }
 
-const KNOWN_BASE = /((?:background$)|devtools|content-script|window)(?:@(\d+))?$/;
+const ENDPOINT_RE = /^((?:background$)|devtools|content-script|window)(?:@(\d+))?$/;
 /**
  * Bridge
  * @external
@@ -48,7 +47,6 @@ const KNOWN_BASE = /((?:background$)|devtools|content-script|window)(?:@(\d+))?$
 class Bridge {
     private static ctxname: string = null;
     private static id: string = null;
-    private static rootContext: RuntimeContext = null;
     private static context: RuntimeContext =
         (chrome.devtools) ? RuntimeContext.Devtools
             : (chrome.tabs) ? RuntimeContext.Background
@@ -61,7 +59,7 @@ class Bridge {
     private static isWindowMessagingAllowed: boolean;
     private static linkedNodesCache = {};
     private static isInitialized = false;
-    private static openTransactions: Map<string, any> = new Map();
+    private static openTransactions: Map<string, { resolve: (v: any) => void; reject: (e: any) => void }> = new Map();
     private static onMessageListeners: Map<string, OnMessageCallback> = new Map();
     private static port: chrome.runtime.Port = null;
     private static portMap: Map<string, chrome.runtime.Port> = new Map();
@@ -70,30 +68,24 @@ class Bridge {
     /**
      * Sends a message to some other endpoint, to which only one listener can send response.
      * Returns Promise. Use `then` or `await` to wait for the response.
-     * If destination is `window` or `frame` message will routed using window.postMessage.
-     * Which requires a shared namespace to be set between parent contexts and children `window`/`frame`(s)
-     * so they can recognize each other when global window.postMessage happens and there are other
+     * If destination is `window` message will routed using window.postMessage.
+     * Which requires a shared namespace to be set between `content-script` and `window`
+     * that way they can recognize each other when global window.postMessage happens and there are other
      * extensions using crx-bridge as well
      * @param messageID
      * @param data
      * @param destination
      */
-    public static sendMessage(messageID: string, data: any, destination: string) {
-        const frags = destination.split(':');
-
+    public static sendMessage(messageID: string, data: any, destination: string | Endpoint) {
+        let endpoint: string = (destination instanceof Endpoint) ? destination.name : destination
         const errFn = 'Bridge#sendMessage ->';
-        if (frags[0].search(KNOWN_BASE) !== 0) {
-            throw new TypeError(`${errFn} Destination must begin with any one of known bases`);
+
+        if (!ENDPOINT_RE.test(endpoint)) {
+            throw new TypeError(`${errFn} Destination must be any one of known destinations`);
         }
 
-        frags.slice(1).forEach((frag) => {
-            if (frag.search(/frame$|(frame#\d+$)/) !== 0) {
-                throw new TypeError(`${errFn} Destination base can only be followed by "frame#2", "frame#4" or just "frame"`);
-            }
-        });
-
         if (this.context === RuntimeContext.Background) {
-            const [input, dest, destTabId] = frags[0].match(KNOWN_BASE);
+            const [input, dest, destTabId] = endpoint.match(ENDPOINT_RE);
             if (dest !== 'background' && !destTabId || !parseInt(destTabId, 10)) {
                 throw new TypeError(`${errFn} When sending messages from background page, use @tabId syntax to target specific tab`);
             }
@@ -103,15 +95,15 @@ class Bridge {
             const payload: IInternalMessage = {
                 messageID,
                 data,
-                destination,
+                destination: endpoint,
                 messageType: 'message',
-                path: frags,
                 transactionId: uuid(),
                 origin: this.ctxname,
                 hops: [],
                 timestamp: Date.now(),
             };
-            this.openTransactions.set(payload.transactionId, resolve);
+
+            this.openTransactions.set(payload.transactionId, { resolve, reject });
             this.routeMessage(payload);
         });
     }
@@ -124,12 +116,6 @@ class Bridge {
         Bridge.namespace = nsps;
     }
 
-    public static enableExternalMessaging = (nsps: string) => {
-        console.warn('External messaging is now deprecated due to added complexity and not so many use cases, use `allowWindowMessaging(nsps: string)` instead');
-        Bridge.isExternalMessagingEnabled = true;
-        Bridge.namespace = nsps;
-    }
-
     public static allowWindowMessaging = (nsps: string) => {
         Bridge.isWindowMessagingAllowed = true;
         Bridge.namespace = nsps;
@@ -139,185 +125,152 @@ class Bridge {
         if (this.isInitialized) {
             return;
         }
+
         if (this.context === null) {
             throw new Error(`Unable to detect runtime context i.e crx-bridge can't figure out what to do`);
         }
+
         this.id = uuid();
         this.ctxname = RuntimeContext[this.context].toLowerCase();
-        if (this.context >= RuntimeContext.Window) {
+
+        if (this.context === RuntimeContext.Window || this.context === RuntimeContext.ContentScript) {
             window.addEventListener('message', this.handleWindowOnMessage);
         }
+
         if (this.context === RuntimeContext.ContentScript) {
             this.ctxname = 'content-script';
-            this.rootContext = RuntimeContext.ContentScript;
         }
+
         if (this.context === RuntimeContext.Devtools) {
             const tabId = chrome.devtools.inspectedWindow.tabId;
             const name = `devtools@${tabId}`;
             this.ctxname = name;
-            this.rootContext = RuntimeContext.Devtools;
+
             this.port = chrome.runtime.connect({ name });
+
             this.port.onMessage.addListener((message: IInternalMessage) => {
                 this.routeMessage(message);
             });
+
             this.port.onDisconnect.addListener(() => {
                 this.port = null;
             });
         }
+
         if (this.context === RuntimeContext.Background) {
             chrome.runtime.onConnect.addListener((port) => {
                 const id = port.name !== '' ? port.name : `content-script@${port.sender.tab.id}`;
                 this.portMap.set(id, port);
+
                 this.messageQueue.forEach((queuedMsg) => {
                     if (queuedMsg.resolvedNextNode === id) {
                         port.postMessage(queuedMsg.message);
                         this.messageQueue.delete(queuedMsg);
                     }
                 });
+
                 port.onDisconnect.addListener(() => {
                     this.portMap.delete(id);
                 });
+
                 port.onMessage.addListener((message: IInternalMessage) => {
                     this.routeMessage(message, { sourcePort: port });
                 });
             });
         }
+
         if (this.context === RuntimeContext.ContentScript && top === window) {
             this.port = chrome.runtime.connect();
             this.port.onMessage.addListener((message: IInternalMessage) => {
                 this.routeMessage(message);
             });
         }
+
         this.isInitialized = true;
     }
 
     private static handleWindowOnMessage = async (ev: MessageEvent) => {
-        const { data, source, ports } = ev;
-        if (data.cmd === '__crx_bridge_probe_root_context') {
-            let type = Bridge.context;
-            if (type === RuntimeContext.Frame) {
-                type = await Bridge.probeRootContextType();
-            }
-            const port: MessagePort = ports[0];
-            port.postMessage(type);
+        if (Bridge.context === RuntimeContext.ContentScript && !Bridge.isWindowMessagingAllowed) {
             return;
         }
-        if (data.cmd === '__crx_bridge_verify_listening' && data.scope === Bridge.namespace) {
+
+        const { data, source, ports } = ev;
+
+        if (data.cmd === '__crx_bridge_verify_listening' && data.scope === Bridge.namespace && data.context !== Bridge.context) {
             const port: MessagePort = ports[0];
             port.postMessage(true);
             return;
-        }
-        if (!Bridge.rootContext) {
-            Bridge.rootContext = await Bridge.probeRootContextType();
-        }
-        if (Bridge.rootContext !== RuntimeContext.Devtools && data.scope !== Bridge.namespace) {
-            return;
-        }
-        if (data.cmd === '__crx_bridge_route_message') {
-            Bridge.ensureNamespace();
-            Bridge.routeMessage(data.payload, { sourceWindow: source });
-        }
-    }
-
-    /**
-     * Used to determine whether or not namespace enforcement is required.
-     * Required if root is `content-script` (a browser tab)
-     * Not required if root is `devtools` (a devtools panel)
-     */
-    private static probeRootContextType(): Promise<RuntimeContext> {
-        return new Promise((resolve, reject) => {
-            if (this.context !== RuntimeContext.Frame) {
-                resolve(this.context);
-            } else if (window.parent !== window) {
-                const channel = new MessageChannel();
-                window.parent.postMessage({ cmd: '__crx_bridge_probe_root_context' }, '*', [channel.port2]);
-                channel.port1.onmessage = (e) => {
-                    const { data } = e;
-                    if (RuntimeContext[data as number]) {
-                        resolve(data as RuntimeContext);
-                    }
-                };
+        } else if (data.cmd === '__crx_bridge_route_message' && data.scope === Bridge.namespace && data.context !== Bridge.context) {
+            // a message event insdide `content-script` means a script inside `window` dispactched it
+            // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
+            if (Bridge.context === RuntimeContext.ContentScript) {
+                data.payload.origin = 'window'
             }
-        });
+
+            Bridge.routeMessage(data.payload)
+        }
     }
 
-    private static routeMessage = async (message: IInternalMessage, options: { sourceWindow?: Window, sourcePort?: chrome.runtime.Port } = {}) => {
-        const { origin, path, messageID, transactionId } = message;
+    private static routeMessage = async (message: IInternalMessage, options: { sourcePort?: chrome.runtime.Port } = {}) => {
+        const { origin, messageID, transactionId, destination } = message;
         if (message.hops.indexOf(Bridge.id) > -1) {
             return;
         }
+
         message.hops.push(Bridge.id);
+
         if (Bridge.context === RuntimeContext.ContentScript
             && /window/.test(message.destination + origin)
-            && !Bridge.allowWindowMessaging
-            && !Bridge.isExternalMessagingEnabled) {
+            && !Bridge.allowWindowMessaging) {
             return;
         }
-        // Deprecated, remove in upcoming release
-        if (Bridge.context === RuntimeContext.ContentScript
-            && /frame/.test(message.destination + origin)
-            && !Bridge.isExternalMessagingEnabled) {
-            return;
-        }
-        if (!Bridge.rootContext) {
-            Bridge.rootContext = await Bridge.probeRootContextType();
-        }
-        if (Bridge.rootContext === RuntimeContext.Devtools) {
-            Bridge.namespace = 'none';
-        }
-        const originNodes = origin.split(':');
-        const nextNode = path[0];
-        if (!nextNode) {
+
+        // It's previous node's job to unset destination, before handing over the payload
+        if (!destination) {
             Bridge.handleInboundMessage(message);
         }
-        if (originNodes[0].search(KNOWN_BASE) === -1 && options.sourceWindow) {
-            const frames = Array.from(document.querySelectorAll('iframe'))
-                .map((frame) => frame.contentWindow);
-            let idx = -1;
-            frames.some((frame, i) => {
-                if (frame === options.sourceWindow) {
-                    idx = i;
-                    return true;
-                }
-                return false;
-            });
-            if (idx > -1) {
-                originNodes[0] = `frame${idx === 0 ? '' : `#{idx}`}`;
-            }
-            message.origin = [Bridge.ctxname, ...originNodes].join(':');
-        }
-        if (nextNode && nextNode.search(KNOWN_BASE) > -1) {
+
+        if (ENDPOINT_RE.test(destination)) {
 
             if (Bridge.context === RuntimeContext.Frame) {
-                Bridge.winRouteMsg(window.parent, message);
+                throw new Error(`crx-bridge no longer supports iframes due to too much complexity and not so many use cases`)
             }
 
-            if (Bridge.context === RuntimeContext.Window) {
+            else if (Bridge.context === RuntimeContext.Window) {
                 Bridge.winRouteMsg(window, message);
             }
 
-            if (Bridge.context === RuntimeContext.ContentScript && nextNode.startsWith('window')) {
-                message.path.shift();
+            else if (Bridge.context === RuntimeContext.ContentScript && destination === 'window') {
+                message.destination = null
                 Bridge.winRouteMsg(window, message);
             }
 
-            if (Bridge.context === RuntimeContext.Devtools || (Bridge.context === RuntimeContext.ContentScript && !nextNode.startsWith('window'))) {
+            else if (Bridge.context === RuntimeContext.Devtools || Bridge.context === RuntimeContext.ContentScript) {
+                if (/background/.test(destination)) {
+                    message.destination = null
+                }
                 // Just hand it over to background page
                 Bridge.port.postMessage(message);
             }
 
-            if (Bridge.context === RuntimeContext.Background && options.sourcePort) {
-                const frags = origin.split(':');
-                const [dest, destName, destTabId] = nextNode.match(KNOWN_BASE);
-                const [src, srcName, srcTabId = `${options.sourcePort.sender.tab.id}`] = frags[0].match(KNOWN_BASE);
+            else if (Bridge.context === RuntimeContext.Background && options.sourcePort) {
+                const [dest, destName, destTabId] = destination.match(ENDPOINT_RE);
+                const [src, srcName, srcTabId = `${options.sourcePort.sender.tab.id}`] = origin.match(ENDPOINT_RE);
                 if (/content-script|window/.test(srcName)) {
-                    frags[0] = `${srcName}@${srcTabId}`;
-                    message.origin = frags.join(':');
+                    message.origin = `${srcName}@${srcTabId}`;
                 }
+
                 const fixedDest = destTabId ? dest : `${dest}@${srcTabId}`;
                 if (destName !== 'window') {
-                    message.path.shift();
+                    message.destination = null
+                } else {
+                    // we're in background page, hence at this point the tab id has been resolved already, so in case it's like `window@932`
+                    // we set this to just `window` because that let's content script know that this is the end of payload journey and stops
+                    // it from recursive message transfers
+                    message.destination = 'window'
                 }
+
+                // As far as background page is concerned, it just needs to get the payload to "actual" tab
                 const resolvedNextNode = destName === 'window' ? fixedDest.replace('window', 'content-script') : fixedDest;
                 const port = Bridge.portMap.get(resolvedNextNode);
                 if (port) {
@@ -327,51 +280,60 @@ class Bridge {
                 }
             }
         }
-
-        if (nextNode && nextNode.startsWith('frame')) {
-            const frames = Array.from(document.querySelectorAll('iframe'))
-                .map((frame) => frame.contentWindow);
-            const frameIdx = parseInt(nextNode.split('#')[1] || '0', 10);
-            frames.some((frame, idx) => {
-                if (frameIdx === idx) {
-                    message.path.shift();
-                    Bridge.winRouteMsg(frame, message);
-                    return true;
-                }
-                return false;
-            });
-        }
     }
 
     private static ensureNamespace = () => {
-        if (Bridge.rootContext === RuntimeContext.Devtools) {
-            return;
-        }
         if (typeof Bridge.namespace !== 'string' || Bridge.namespace.length === 0) {
-            const err = `crx-bridge uses window.postMessage to talk with other "window"(s) or "frame"(s), for message routing and stuff,` +
+            const err = `crx-bridge uses window.postMessage to talk with other "window"(s), for message routing and stuff,` +
                 ` which is global/conflicting operation in case there are other scripts using crx-bridge. ` +
                 `Call Bridge#setNamespace(nsps) to isolate your app. Example: Bridge.setNamespace('com.facebook.react-devtools'). ` +
                 `Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`;
-            throw new TypeError(err);
+            throw new Error(err);
         }
     }
 
     private static async handleInboundMessage(message: IInternalMessage) {
         const { transactionId, messageID, messageType } = message;
         // Sender context
-        if (messageType === 'reply' && Bridge.openTransactions.has(transactionId)) {
-            const resolver = Bridge.openTransactions.get(transactionId);
-            resolver(message.data);
-            Bridge.openTransactions.delete(transactionId);
-        } else if (messageType === 'message' && Bridge.onMessageListeners.has(messageID)) {
-            const cb = Bridge.onMessageListeners.get(messageID);
-            if (typeof cb === 'function') {
-                const reply = await cb({
-                    sender: new Endpoint(message.origin),
-                    id: messageID,
-                    data: message.data,
-                    timestamp: message.timestamp,
-                } as IBridgeMessage);
+        if (messageType === 'reply') {
+            const transactionP = Bridge.openTransactions.get(transactionId);
+            if (transactionP) {
+                const { err, data } = message
+                if (err) {
+                    const hydratedErr = new (typeof self[err.name] === 'function' ? self[err.name] : Error)(err.message)
+                    for (let prop in err) {
+                        hydratedErr[prop] = err[prop]
+                    }
+                    transactionP.reject(hydratedErr)
+                } else {
+                    transactionP.resolve(data)
+                }
+                Bridge.openTransactions.delete(transactionId);
+            }
+        } else if (messageType === 'message') {
+            let reply: any;
+            let err
+            let noHandlerFoundError = false
+            try {
+                const cb = Bridge.onMessageListeners.get(messageID);
+                if (typeof cb === 'function') {
+                    reply = await cb({
+                        sender: new Endpoint(message.origin),
+                        id: messageID,
+                        data: message.data,
+                        timestamp: message.timestamp,
+                    } as IBridgeMessage);
+                } else {
+                    noHandlerFoundError = true
+                    throw new Error(`[crx-bridge] No handler registered in '${Bridge.ctxname}' to accept messages with id '${messageID}'`)
+                }
+            } catch (error) {
+                err = error
+            } finally {
+
+                if (err) {
+                    message.err = serializeError(err)
+                }
 
                 Bridge.routeMessage({
                     ...message,
@@ -379,9 +341,12 @@ class Bridge {
                     data: reply,
                     origin: Bridge.ctxname,
                     destination: message.origin,
-                    path: message.origin.split(':'),
                     hops: [],
                 });
+
+                if (err && !noHandlerFoundError) {
+                    throw reply
+                }
             }
         }
     }
@@ -399,9 +364,10 @@ class Bridge {
                 cmd: '__crx_bridge_route_message',
                 scope: Bridge.namespace,
                 payload: msg,
+                context: Bridge.context,
             }, '*');
         };
-        win.postMessage({ cmd: '__crx_bridge_verify_listening', scope: Bridge.namespace }, '*', [channel.port2]);
+        win.postMessage({ cmd: '__crx_bridge_verify_listening', scope: Bridge.namespace, context: Bridge.context }, '*', [channel.port2]);
     }
 }
 Bridge.init();
