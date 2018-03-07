@@ -4,6 +4,10 @@ class Endpoint {
         this._name = path;
     }
 
+    public get name() {
+        return this._name;
+    }
+
     public get path() {
         console.warn(`'sender.path' is now deprecated, since it no longer supports iframes. Use 'sender.name' instead`)
         return this._name;
