@@ -87,7 +87,12 @@ Just `import Bridge from 'crx-bridge'` wherever you need it and use as shown in 
 ## `Bridge.sendMessage(messageId: string, data: any, destination: string)`
 Sends a message to some other part of your extension, out of the box.
 
-Listener on the other may want to reply. Get the reply by `await`ing the returned `Promise`
+Notes:
+ - If there is no listener on the other side an error will be thrown where `sendMessage` was called.
+
+- Listener on the other may want to reply. Get the reply by `await`ing the returned `Promise`
+
+- An error thrown in listener callback (in the destination context) will behave as usual, that is, bubble up, but the same error will also be thrown where `sendMessage` was called
 
 #### `messageId`
 > Required | `string`
@@ -97,7 +102,7 @@ Any `string` that both sides of your extension agree on. Could be `get-flag-coun
 #### `data`
 > Required | `any`
 
-Any value you want to pass to other side, latter can access this value by refering to `data` property of first argument to `onMessage` callback function.
+Any serializable value you want to pass to other side, latter can access this value by refering to `data` property of first argument to `onMessage` callback function.
 
 #### `destination`
 > Required | `string`
@@ -105,15 +110,11 @@ Any value you want to pass to other side, latter can access this value by referi
 The actual identifier of other endpoint.
 Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453`
 
-Structure:
- - Must begin with known roots - `background` or `content-script` or `devtools` or `window`
- - `devtools` roots can be followed by `frame`(s), separated by `':'`, like `devtools:frame#3` (here #3 means third frame from top (zero-index based))
- - Known root can only occur once or put another way, `content-script:devtools`, `devtools:devtoolssss` etc are invalid
- - `content-script`, `window` and `devtools` roots can be suffixed with `@tabId` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
+`content-script`, `window` and `devtools` destinations can be suffixed with `@<tabId>` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
 
- Read `Behaviour` section to see how destinations (or endpoints) are treated.
+Read `Behaviour` section to see how destinations (or endpoints) are treated.
 
- > Note: For security reasons, if you want to receive or send messages to or from `window` root context, one of your extension's content script must call `Bridge.allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `Bridge.setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `crx-bridge` knows which message belongs to which extension (in case multiple extensions are using `crx-bride` in one page)
+> Note: For security reasons, if you want to receive or send messages to or from `window` context, one of your extension's content script must call `Bridge.allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `Bridge.setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `crx-bridge` knows which message belongs to which extension (in case multiple extensions are using `crx-bride` in one page)
 
 ___
 
@@ -147,15 +148,13 @@ Unlocks the transmission of messages to and from `window` (top frame of loaded p
 `crx-bridge` by default won't transmit any payload to or from `window` contexts for security reasons.
 This method can be called from a content script (in top frame of tab), which opens a gateway for messages.
 
-Once again, `window` = the top frame of any tab. That means __allowing window messaging without checking origin first__ will let JavaScript loaded at `https://evil.com` talk with your extension and possibly give indirect access to things you won't want to like `history` API. You're expected to ensure the
+Once again, `window` = the top frame of any tab. That means __allowing window messaging without checking origin first__ will let JavaScript loaded at `https://evil.com` talk with your extension and possibly give indirect access to things you won't want to, like `history` API. You're expected to ensure the
 safety and privacy of your extension's users.
 
 #### `namespace`
 > Required | `string`
 
-Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `Bridge.setNamespace` in `window` and `frame` contexts with same value, so that `crx-bridge` knows which payload belongs to which extension (in case there are other extensions using `crx-bridge` in a tab). Make sure namespace string is unique enough to 
-ensure no collisions happen.
-
+Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `Bridge.setNamespace` in `window` and `frame` contexts with same value, so that `crx-bridge` knows which payload belongs to which extension (in case there are other extensions using `crx-bridge` in a tab). Make sure namespace string is unique enough to ensure no collisions happen.
 ___
 
  ## `Bridge.setNamespace(namespace: string)`
@@ -207,7 +206,7 @@ Only one listener per channel per context
 
 Callback that should be called whenever `Stream` is opened from the other side. Callback will be called with one argument, the `Stream` object, documented below.
 
-`Stream`(s) can be opened by a malicious webpage(s) if a tab's content script has called `Bridge.allowWindowMessaging`, if working with sensitive information use `stream.info.endpoint.isInternal()` to check, if `false` call `stream.close()` immediately.
+`Stream`(s) can be opened by a malicious webpage(s) if your extension's content script in that tab has called `Bridge.allowWindowMessaging`, if working with sensitive information use `stream.info.endpoint.isInternal()` to check, if `false` call `stream.close()` immediately.
 
 ### Stream Example
 
@@ -228,9 +227,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
  - Specifying `content-script` as destination from `devtools` will auto-route the message to  inspected window's top `content-script` page if listening. If page is loading, message will be queued up and deliverd when page is ready and listening.
 
- - If `window` context (which could be a baby of script injected by content script) are source or destination of any payload, transmission must be first unlocked by calling `Bridge.allowWindowMessaging(<namespace: string>)` inside a that page's top content script, since `Bridge` will first deliver the payload to `content-script` using rules above, and latter will take over and forward accordingly. `content-script` <-> `window` messaging happens using `window.postMessage` API. Therefore to avoid conflicts, `Bridge` requires you to call `Bridge.setNamespace(uuidOrReverseDomain)` inside `window` the said window script (injected or remote, doesn't matter).
-
- - Bridge assumes that everything you load up in devtools panel is all under your ownership and control. Thus calling `Bridge.sendMessage(msgId, data, 'devtools:frame#1:frame')` from `content-script` will work out of the box (no conflict checks are done, because of ownership assumption)
+ - If `window` context (which could be a script injected by content script) are source or destination of any payload, transmission must be first unlocked by calling `Bridge.allowWindowMessaging(<namespace: string>)` inside that page's top content script, since `Bridge` will first deliver the payload to `content-script` using rules above, and latter will take over and forward accordingly. `content-script` <-> `window` messaging happens using `window.postMessage` API. Therefore to avoid conflicts, `Bridge` requires you to call `Bridge.setNamespace(uuidOrReverseDomain)` inside the said window script (injected or remote, doesn't matter).
 
  - Specifying `devtools` or `content-script` or `window` from `background` will throw an error. When calling from `background`, destination must be suffixed with tab id. Like `devtools@745` for `devtools` inspecting tab id 745 or `content-script@351` for top `content-script` at tab id 351.
 
@@ -262,9 +259,6 @@ Bridge.onMessage('getUserBrowsingHistory', (message) => {
     }
 })
 ```
-
-> Since `crx-bridge` assumes you have full control over what loads in your devtools panel, `sender.isInternal()` will return `true` for `devtools:frame#2:frame#1`
-<br> Alternatively use `sender.isReallyInternal()` to return `false` in such cases.
 
 <a name="troubleshooting"></a>
 
