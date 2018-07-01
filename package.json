@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chipto/crx-bridge.git"
+    "url": "git+https://github.com/NeekSandhu/crx-bridge.git"
   },
   "keywords": [
     "chrome",
@@ -25,12 +25,12 @@
     "crx",
     "bridge"
   ],
-  "author": "Neek Sandhu <neek.sandhu@chipto.io>",
+  "author": "Neek Sandhu <neek.sandhu@outlook.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chipto/crx-bridge/issues"
+    "url": "https://github.com/NeekSandhu/crx-bridge/issues"
   },
-  "homepage": "https://github.com/chipto/crx-bridge#readme",
+  "homepage": "https://github.com/NeekSandhu/crx-bridge#readme",
   "devDependencies": {
     "@types/chrome": "0.0.50",
     "@types/node": "^8.0.46",
