@@ -40,6 +40,10 @@ enum RuntimeContext {
 }
 
 const ENDPOINT_RE = /^((?:background$)|devtools|content-script|window)(?:@(\d+))?$/;
+
+// Return true if the `chrome` object has a particular property
+const hasChrome = (prop: string): boolean => (typeof chrome !== 'undefined' && chrome[prop]);
+
 /**
  * Bridge
  * @external
@@ -48,9 +52,9 @@ class Bridge {
     private static ctxname: string = null;
     private static id: string = null;
     private static context: RuntimeContext =
-        (chrome.devtools) ? RuntimeContext.Devtools
-            : (chrome.tabs) ? RuntimeContext.Background
-                : (chrome.extension) ? RuntimeContext.ContentScript
+        hasChrome('devtools') ? RuntimeContext.Devtools
+            : hasChrome('tabs') ? RuntimeContext.Background
+                : hasChrome('extension') ? RuntimeContext.ContentScript
                     : (typeof document === 'undefined' && typeof importScripts === 'function') ? RuntimeContext.Worker
                         : (typeof document !== 'undefined' && window.top !== window) ? RuntimeContext.Frame
                             : (typeof document !== 'undefined') ? RuntimeContext.Window : null;
