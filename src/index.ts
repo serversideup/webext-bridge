@@ -1,5 +1,5 @@
-import { BridgePlus } from './BridgePlus';
-export { IBridgeMessage, OnMessageCallback } from './Bridge';
+import * as Bridge from './Bridge';
+
 export { Stream } from './Stream';
-export { Endpoint } from './Endpoint';
-export default BridgePlus;
+export * from './Bridge';
+export default Bridge;

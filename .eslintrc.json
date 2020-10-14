@@ -1,0 +1,51 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "plugin:import/errors",
+      "plugin:import/warnings",
+      "plugin:import/typescript"
+    ],
+    "plugins": [
+      "@typescript-eslint",
+      "import"
+    ],
+    "rules": {
+      "semi": "error",
+      "quotes": ["error", "single", { "avoidEscape": true }],
+      "comma-dangle": ["error", {
+        "imports": "never",
+        "exports": "never",
+        "arrays": "only-multiline",
+        "objects": "only-multiline",
+        "functions": "never"
+      }],
+      "import/order": ["error", {
+        "groups": [["builtin", "external"], ["internal", "parent", "sibling", "index"]]
+      }],
+      "import/newline-after-import": "error",
+      "import/named": "off",
+      "import/default": "off",
+      "no-shadow": "error",
+      "no-multiple-empty-lines": 2,
+      "no-multi-spaces": "error",
+      "no-trailing-spaces": "error",
+      "no-extra-semi": "error",
+      "no-extend-native": "error",
+      "no-unneeded-ternary": "error",
+      "arrow-spacing": "error",
+      "prefer-object-spread": "error",
+      "prefer-const": "error",
+      "prefer-destructuring": ["error", { "object": true, "array": false }],
+      "prefer-spread": "error",
+      "prefer-rest-params": "error",
+      "indent": "off",
+      "@typescript-eslint/indent": ["error", "tab"]
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {}
+      }
+    }
+  }
+  

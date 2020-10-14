@@ -6,6 +6,7 @@
         "jsx": "react",
         "sourceMap": true,
         "declaration": true,
+        "esModuleInterop": true,
         "declarationDir": "./dist"
     },
     "exclude": [
