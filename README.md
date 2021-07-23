@@ -2,11 +2,13 @@
 
 Messaging in Web Extensions made super easy. Out of the box.
 
+[![](https://img.shields.io/npm/v/webext-bridge?color=2B90B6&label=)](https://www.npmjs.com/package/webext-bridge)
+
 > Forked from [crx-bridge](https://github.com/NeekSandhu/crx-bridge) by [NeekSandhu](https://github.com/NeekSandhu)
 
 ##### Changes in this fork
 
-- build esm only
+- build esm instead of cjs (for better bundler optimization)
 - use `nanoevents` instead of `events` (decoupled form node module)
 
 ----
@@ -20,7 +22,7 @@ This much
 ```javascript
 // Inside devtools script
 
-import { sendMessage } from 'crx-bridge';
+import { sendMessage } from 'webext-bridge';
 
 // ...
 
@@ -33,7 +35,7 @@ button.addEventListener('click', () => {
 ```javascript
 // Inside content script
 
-import { sendMessage, onMessage } from 'crx-bridge';
+import { sendMessage, onMessage } from 'webext-bridge';
 
 onMessage('get-selection', async (message) => {
   const { sender, data: { ignoreCasing } } = message;
@@ -48,7 +50,7 @@ onMessage('get-selection', async (message) => {
 ```javascript
 // Inside background script
 
-import { onMessage } from 'crx-bridge';
+import { onMessage } from 'webext-bridge';
 
 onMessage('get-preferences', ({ data }) => {
 	const { sync } = data;
@@ -59,7 +61,7 @@ onMessage('get-preferences', ({ data }) => {
 
 > Examples above require transpilation and/or bundling using `webpack`/`babel`/`rollup`
 
-`crx-bridge` handles everything for you as efficiently as possible. No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `chrome.runtime.connect` ....
+`webext-bridge` handles everything for you as efficiently as possible. No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `chrome.runtime.connect` ....
 
 # Contents
 
@@ -76,16 +78,16 @@ onMessage('get-preferences', ({ data }) => {
 ### Install
 
 ```bash
-$ npm i crx-bridge
+$ npm i webext-bridge
 ```
 
 ### Light it up
 
-Just `import Bridge from 'crx-bridge'` wherever you need it and use as shown in [example above](#example)
+Just `import Bridge from 'webext-bridge'` wherever you need it and use as shown in [example above](#example)
 
 > Even if your extension doesn't need a background page or wont be sending/receiving messages in background script.
-> <br> `crx-bridge` uses background/event context as staging area for messages, therefore it **must** loaded in background/event page for it to work.
-> <br> (Attempting to send message from any context will fail silently if `crx-bridge` isn't available in background page).
+> <br> `webext-bridge` uses background/event context as staging area for messages, therefore it **must** loaded in background/event page for it to work.
+> <br> (Attempting to send message from any context will fail silently if `webext-bridge` isn't available in background page).
 > <br> See [troubleshooting section](#troubleshooting) for more.
 
 <a name="api"></a>
@@ -127,7 +129,7 @@ Example: `devtools` or `content-script` or `background` or `content-script@133` 
 
 Read `Behaviour` section to see how destinations (or endpoints) are treated.
 
-> Note: For security reasons, if you want to receive or send messages to or from `window` context, one of your extension's content script must call `Bridge.allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `Bridge.setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `crx-bridge` knows which message belongs to which extension (in case multiple extensions are using `crx-bride` in one page)
+> Note: For security reasons, if you want to receive or send messages to or from `window` context, one of your extension's content script must call `Bridge.allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `Bridge.setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `webext-bridge` knows which message belongs to which extension (in case multiple extensions are using `webext-bridge` in one page)
 
 ---
 
@@ -162,7 +164,7 @@ Read [security note](#security) before using this.
 Applicable to content scripts (noop if called from anywhere else)
 
 Unlocks the transmission of messages to and from `window` (top frame of loaded page) contexts in the tab where it is called.
-`crx-bridge` by default won't transmit any payload to or from `window` contexts for security reasons.
+`webext-bridge` by default won't transmit any payload to or from `window` contexts for security reasons.
 This method can be called from a content script (in top frame of tab), which opens a gateway for messages.
 
 Once again, `window` = the top frame of any tab. That means **allowing window messaging without checking origin first** will let JavaScript loaded at `https://evil.com` talk with your extension and possibly give indirect access to things you won't want to, like `history` API. You're expected to ensure the
@@ -172,7 +174,7 @@ safety and privacy of your extension's users.
 
 > Required | `string`
 
-Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `Bridge.setNamespace` in `window` context with same value, so that `crx-bridge` knows which payload belongs to which extension (in case there are other extensions using `crx-bridge` in a tab). Make sure namespace string is unique enough to ensure no collisions happen.
+Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `Bridge.setNamespace` in `window` context with same value, so that `webext-bridge` knows which payload belongs to which extension (in case there are other extensions using `webext-bridge` in a tab). Make sure namespace string is unique enough to ensure no collisions happen.
 
 ---
 
@@ -186,7 +188,7 @@ Sets the namespace `Bridge` should use when relaying messages to and from `windo
 
 > Required | `string`
 
-Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `Bridge.setNamespace` in `window` context with same value, so that `crx-bridge` knows which payload belongs to which extension (in case there are other extensions using `crx-bridge` in a tab). Make sure namespace string is unique enough to ensure no collisions happen.
+Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `Bridge.setNamespace` in `window` context with same value, so that `webext-bridge` knows which payload belongs to which extension (in case there are other extensions using `webext-bridge` in a tab). Make sure namespace string is unique enough to ensure no collisions happen.
 
 ## Extras
 
@@ -262,9 +264,9 @@ The following note only applies if and only if, you will be sending/receiving me
 
 `window` context(s) in tab `A` get unlocked the moment you call `Bridge.allowWindowMessaging(namespace)` somewhere in your extenion's content script(s) that's also loaded in tab `A`.
 
-Unlike `chrome.runtime.sendMessage` and `chrome.runtime.connect`, which requires extension's manifest to specify sites allowed to talk with the extension, `crx-bridge` has no such measure by design, which means any webpage whether you intended or not, can do `Bridge.sendMessage(msgId, data, 'background')` or something similar that produces same effect, as long as it uses same protocol used by `crx-bridge` and namespace set to same as yours.
+Unlike `chrome.runtime.sendMessage` and `chrome.runtime.connect`, which requires extension's manifest to specify sites allowed to talk with the extension, `webext-bridge` has no such measure by design, which means any webpage whether you intended or not, can do `Bridge.sendMessage(msgId, data, 'background')` or something similar that produces same effect, as long as it uses same protocol used by `webext-bridge` and namespace set to same as yours.
 
-So to be safe, if you will be interacting with `window` contexts, treat `crx-bridge` as you would treat `window.postMessage` API.
+So to be safe, if you will be interacting with `window` contexts, treat `webext-bridge` as you would treat `window.postMessage` API.
 
 Before you call `Bridge.allowWindowMessaging`, check if that page's `window.location.origin` is something you expect already.
 
@@ -272,7 +274,7 @@ As an example if you plan on having something critical, **always** verify the `s
 
 ```javascript
 // background.js
-import { onMessage, isInternalEndpoint } from 'crx-bridge';
+import { onMessage, isInternalEndpoint } from 'webext-bridge';
 
 onMessage('getUserBrowsingHistory', (message) => {
   const { data, sender } = message;
@@ -289,12 +291,12 @@ onMessage('getUserBrowsingHistory', (message) => {
 # Troubleshooting
 
 - Doesn't work?
-  <br>If `window` contexts are not part of the puzzle, `crx-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `crx-bridge` hasn't been loaded in background page of your extension, which is used by `crx-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `crx-bridge` going.
+  <br>If `window` contexts are not part of the puzzle, `webext-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `webext-bridge` hasn't been loaded in background page of your extension, which is used by `webext-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `webext-bridge` going.
 
 ```javascript
 // background.js (requires transpilation/bundling using webpack(recommended))
 
-import 'crx-bridge';
+import 'webext-bridge';
 ```
 
 ```javascript

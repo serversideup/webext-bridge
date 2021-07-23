@@ -66,7 +66,7 @@ class Stream {
    * Will trigger onMessage on the other side.
    *
    * Warning: Before sending sensitive data, verify the endpoint using `stream.info.endpoint.isInternal()`
-   * The other side could be malicious webpage speaking same language as crx-bridge
+   * The other side could be malicious webpage speaking same language as webext-bridge
    * @param msg
    */
   public send(msg?: JsonValue): void {

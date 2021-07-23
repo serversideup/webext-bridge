@@ -83,7 +83,7 @@ initIntercoms()
  * If destination is `window` message will routed using window.postMessage.
  * Which requires a shared namespace to be set between `content-script` and `window`
  * that way they can recognize each other when global window.postMessage happens and there are other
- * extensions using crx-bridge as well
+ * extensions using webext-bridge as well
  * @param messageID
  * @param data
  * @param destination
@@ -133,7 +133,7 @@ export function allowWindowMessaging(nsps: string): void {
 
 function initIntercoms() {
   if (context === null)
-    throw new Error('Unable to detect runtime context i.e crx-bridge can\'t figure out what to do')
+    throw new Error('Unable to detect runtime context i.e webext-bridge can\'t figure out what to do')
 
   if (context === 'window' || context === 'content-script')
     window.addEventListener('message', handleWindowOnMessage)
@@ -301,7 +301,7 @@ async function handleInboundMessage(message: IInternalMessage) {
       }
       else {
         noHandlerFoundError = true
-        throw new Error(`[crx-bridge] No handler registered in '${context}' to accept messages with id '${messageID}'`)
+        throw new Error(`[webext-bridge] No handler registered in '${context}' to accept messages with id '${messageID}'`)
       }
     }
     catch (error) {
@@ -376,8 +376,8 @@ function routeMessageThroughWindow(win: Window, msg: IInternalMessage) {
 function ensureNamespaceSet() {
   if (typeof namespace !== 'string' || namespace.length === 0) {
     throw new Error(
-      'crx-bridge uses window.postMessage to talk with other "window"(s), for message routing and stuff,'
-      + 'which is global/conflicting operation in case there are other scripts using crx-bridge. '
+      'webext-bridge uses window.postMessage to talk with other "window"(s), for message routing and stuff,'
+      + 'which is global/conflicting operation in case there are other scripts using webext-bridge. '
       + 'Call Bridge#setNamespace(nsps) to isolate your app. Example: Bridge.setNamespace(\'com.facebook.react-devtools\'). '
       + 'Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`',
     )

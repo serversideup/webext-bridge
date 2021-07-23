@@ -47,7 +47,7 @@ onMessage<{ channel: string; streamId: string }>('__crx_bridge_stream_open__', (
 
 async function openStream(channel: string, destination: string | Endpoint): Promise<Stream> {
   if (openStreams.has(channel))
-    throw new Error('crx-bridge: A Stream is already open at this channel')
+    throw new Error('webext-bridge: A Stream is already open at this channel')
 
   const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
 
@@ -61,7 +61,7 @@ async function openStream(channel: string, destination: string | Endpoint): Prom
 
 function onOpenStreamChannel(channel: string, callback: (stream: Stream) => void): void {
   if (onOpenStreamCallbacks.has(channel))
-    throw new Error('crx-bridge: This channel has already been claimed. Stream allows only one-on-one communication')
+    throw new Error('webext-bridge: This channel has already been claimed. Stream allows only one-on-one communication')
 
   onOpenStreamCallbacks.set(channel, callback)
   streamyEmitter.emit('did-change-stream-callbacks')
