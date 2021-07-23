@@ -1,17 +1,7 @@
 {
-  "name": "crx-bridge",
-  "version": "3.0.1",
-  "description": "Messaging in Chrome extensions made easy. Out of the box.",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NeekSandhu/crx-bridge.git"
-  },
+  "name": "webext-bridge",
+  "version": "0.1.0",
+  "description": "Messaging in Web Extensions made easy. Out of the box.",
   "keywords": [
     "chrome",
     "extension",
@@ -25,27 +15,41 @@
     "crx",
     "bridge"
   ],
-  "author": "Neek Sandhu <neek.sandhu@outlook.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antfu/webext-bridge.git"
+  },
+  "author": "Neek Sandhu <neek.sandhu@outlook.com>",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "watch": "npm run build -- --watch",
+    "release": "bumpp --commit --push --tag && npm run build && npm publish"
+  },
+  "files": [
+    "dist"
+  ],
   "bugs": {
-    "url": "https://github.com/NeekSandhu/crx-bridge/issues"
+    "url": "https://github.com/antfu/webext-bridge/issues"
   },
-  "homepage": "https://github.com/NeekSandhu/crx-bridge#readme",
-  "devDependencies": {
-    "@types/node": "^8.0.46",
-    "@types/serialize-error": "^4.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.4.1",
-    "@typescript-eslint/parser": "^4.4.1",
-    "eslint": "^7.11.0",
-    "eslint-import-resolver-typescript": "^2.3.0",
-    "eslint-plugin-import": "^2.22.1",
-    "type-fest": "^0.18.0",
-    "typescript": "^4.0.3"
-  },
+  "homepage": "https://github.com/antfu/webext-bridge#readme",
   "dependencies": {
-    "oneline": "^1.0.3",
-    "serialize-error": "^2.1.0",
-    "tiny-uid": "^1.1.1",
-    "webextension-polyfill-ts": "^0.20.0"
+    "nanoevents": "^6.0.0",
+    "nanoid": "^3.1.23",
+    "serialize-error": "^8.1.0",
+    "webextension-polyfill-ts": "^0.26.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.7.0",
+    "@types/node": "^16.4.1",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "eslint": "^7.31.0",
+    "tsup": "^4.12.5",
+    "type-fest": "^1.2.2",
+    "typescript": "^4.3.5"
   }
 }

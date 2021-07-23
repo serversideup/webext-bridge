@@ -1,6 +1,15 @@
-# crx-bridge
+# webext-bridge
 
-Messaging in Chrome extensions made super easy. Out of the box.
+Messaging in Web Extensions made super easy. Out of the box.
+
+> Forked from [crx-bridge](https://github.com/NeekSandhu/crx-bridge) by [NeekSandhu](https://github.com/NeekSandhu)
+
+##### Changes in this fork
+
+- build esm only
+- use `nanoid` and `nanoevents` instead of `tiny-uuid` and `events`
+
+----
 
 ## How much easy exactly?
 

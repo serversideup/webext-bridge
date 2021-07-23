@@ -1,16 +1,17 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2018",
-        "outDir": "./dist",
-        "jsx": "react",
-        "sourceMap": true,
-        "declaration": true,
-        "esModuleInterop": true,
-        "declarationDir": "./dist"
-    },
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2018",
+    "outDir": "./dist",
+    "jsx": "react",
+    "sourceMap": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "declarationDir": "./dist"
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
