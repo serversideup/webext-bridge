@@ -7,7 +7,7 @@ Messaging in Web Extensions made super easy. Out of the box.
 ##### Changes in this fork
 
 - build esm only
-- use `nanoid` and `nanoevents` instead of `tiny-uuid` and `events`
+- use `nanoevents` instead of `events` (decoupled form node module)
 
 ----
 

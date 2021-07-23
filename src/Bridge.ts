@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid'
+import uuid from 'tiny-uuid'
 
 import { createNanoEvents } from 'nanoevents'
 import { StreamInfo, Stream } from './Stream'
@@ -51,7 +51,7 @@ async function openStream(channel: string, destination: string | Endpoint): Prom
 
   const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
 
-  const streamInfo: StreamInfo = { streamId: nanoid(), channel, endpoint }
+  const streamInfo: StreamInfo = { streamId: uuid(), channel, endpoint }
   const stream = new Stream(streamInfo)
   stream.onClose(() => openStreams.delete(channel))
   await sendMessage('__crx_bridge_stream_open__', streamInfo, endpoint)

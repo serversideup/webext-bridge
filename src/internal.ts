@@ -1,7 +1,7 @@
 import type { JsonValue } from 'type-fest'
 import { browser, Runtime } from 'webextension-polyfill-ts'
 import { serializeError } from 'serialize-error'
-import { nanoid } from 'nanoid'
+import uuid from 'tiny-uuid'
 
 enum RuntimeContext {
   Devtools = 'devtools',
@@ -67,7 +67,7 @@ const context: RuntimeContext
       ? RuntimeContext.ContentScript
       : (typeof document !== 'undefined') ? RuntimeContext.Window : null
 
-const runtimeId: string = nanoid()
+const runtimeId: string = uuid()
 const openTransactions = new Map<string, { resolve: (v: void | JsonValue | PromiseLike<JsonValue>) => void; reject: (e: JsonValue) => void }>()
 const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
 const messageQueue = new Set<IQueuedMessage>()
@@ -110,7 +110,7 @@ export async function sendMessage<T extends JsonValue>(messageID: string, data: 
       data,
       destination: endpoint,
       messageType: 'message',
-      transactionId: nanoid(),
+      transactionId: uuid(),
       origin: { context, tabId: null },
       hops: [],
       timestamp: Date.now(),
