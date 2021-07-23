@@ -3,12 +3,7 @@ import { browser, Runtime } from 'webextension-polyfill-ts'
 import { serializeError } from 'serialize-error'
 import uuid from 'tiny-uuid'
 
-enum RuntimeContext {
-  Devtools = 'devtools',
-  Background = 'background',
-  ContentScript = 'content-script',
-  Window = 'window'
-}
+export type RuntimeContext = 'devtools' | 'background' | 'content-script' | 'window'
 
 export type Endpoint = {
   context: RuntimeContext
@@ -44,7 +39,7 @@ interface IQueuedMessage {
 const ENDPOINT_RE = /^((?:background$)|devtools|content-script|window)(?:@(\d+))?$/
 
 export const parseEndpoint = (endpoint: string): Endpoint => {
-  const [, context, tabId] = endpoint.match(ENDPOINT_RE)
+  const [, context, tabId] = endpoint.match(ENDPOINT_RE) || []
 
   return {
     context: context as RuntimeContext,
@@ -53,19 +48,21 @@ export const parseEndpoint = (endpoint: string): Endpoint => {
 }
 
 export const isInternalEnpoint = ({ context: ctx }: Endpoint): boolean =>
-  [RuntimeContext.ContentScript, RuntimeContext.Background, RuntimeContext.Devtools].includes(ctx)
+  ['content-script', 'background', 'devtools'].includes(ctx)
 
 // Return true if the `browser` object has a specific namespace
 const hasAPI = (nsps: string): boolean => browser[nsps]
 
 const context: RuntimeContext
 = hasAPI('devtools')
-  ? RuntimeContext.Devtools
+  ? 'devtools'
   : hasAPI('tabs')
-    ? RuntimeContext.Background
+    ? 'background'
     : hasAPI('extension')
-      ? RuntimeContext.ContentScript
-      : (typeof document !== 'undefined') ? RuntimeContext.Window : null
+      ? 'content-script'
+      : (typeof document !== 'undefined')
+        ? 'window'
+        : null
 
 const runtimeId: string = uuid()
 const openTransactions = new Map<string, { resolve: (v: void | JsonValue | PromiseLike<JsonValue>) => void; reject: (e: JsonValue) => void }>()
@@ -98,7 +95,7 @@ export async function sendMessage<T extends JsonValue>(messageID: string, data: 
   if (!endpoint.context)
     throw new TypeError(`${errFn} Destination must be any one of known destinations`)
 
-  if (context === RuntimeContext.Background) {
+  if (context === 'background') {
     const { context: dest, tabId: destTabId } = endpoint
     if (dest !== 'background' && !destTabId)
       throw new TypeError(`${errFn} When sending messages from background page, use @tabId syntax to target specific tab`)
@@ -138,17 +135,17 @@ function initIntercoms() {
   if (context === null)
     throw new Error('Unable to detect runtime context i.e crx-bridge can\'t figure out what to do')
 
-  if (context === RuntimeContext.Window || context === RuntimeContext.ContentScript)
+  if (context === 'window' || context === 'content-script')
     window.addEventListener('message', handleWindowOnMessage)
 
-  if (context === RuntimeContext.ContentScript && top === window) {
+  if (context === 'content-script' && top === window) {
     port = browser.runtime.connect()
     port.onMessage.addListener((message: IInternalMessage) => {
       routeMessage(message)
     })
   }
 
-  if (context === RuntimeContext.Devtools) {
+  if (context === 'devtools') {
     const { tabId } = browser.devtools.inspectedWindow
     const name = `devtools@${tabId}`
 
@@ -163,7 +160,7 @@ function initIntercoms() {
     })
   }
 
-  if (context === RuntimeContext.Background) {
+  if (context === 'background') {
     browser.runtime.onConnect.addListener((incomingPort) => {
       // when coming from devtools, it's should pre-fabricated with inspected tab as linked tab id
       const portId = incomingPort.name || `content-script@${incomingPort.sender.tab.id}`
@@ -207,8 +204,8 @@ function routeMessage(message: IInternalMessage): void | Promise<void> {
 
   message.hops.push(runtimeId)
 
-  if (context === RuntimeContext.ContentScript
-    && [destination, origin].some(endpoint => endpoint?.context === RuntimeContext.Window)
+  if (context === 'content-script'
+    && [destination, origin].some(endpoint => endpoint?.context === 'window')
     && !isWindowMessagingAllowed)
     return
 
@@ -217,29 +214,29 @@ function routeMessage(message: IInternalMessage): void | Promise<void> {
     return handleInboundMessage(message)
 
   if (destination.context) {
-    if (context === RuntimeContext.Window) {
+    if (context === 'window') {
       return routeMessageThroughWindow(window, message)
     }
 
-    else if (context === RuntimeContext.ContentScript && destination.context === RuntimeContext.Window) {
+    else if (context === 'content-script' && destination.context === 'window') {
       message.destination = null
       return routeMessageThroughWindow(window, message)
     }
 
-    else if (context === RuntimeContext.Devtools || context === RuntimeContext.ContentScript) {
-      if (destination.context === RuntimeContext.Background)
+    else if (context === 'devtools' || context === 'content-script') {
+      if (destination.context === 'background')
         message.destination = null
 
       // Just hand it over to background page
       return port.postMessage(message)
     }
 
-    else if (context === RuntimeContext.Background) {
+    else if (context === 'background') {
       const { context: destName, tabId: destTabId } = destination
       const { tabId: srcTabId } = origin
 
       // remove the destination in case the message isn't going to `window`; it'll be forwarded to either `content-script` or `devtools`...
-      if (destName !== RuntimeContext.Window) {
+      if (destName !== 'window') {
         message.destination = null
       }
       else {
@@ -335,7 +332,7 @@ async function handleInboundMessage(message: IInternalMessage) {
 }
 
 async function handleWindowOnMessage({ data, ports }: MessageEvent) {
-  if (context === RuntimeContext.ContentScript && !isWindowMessagingAllowed)
+  if (context === 'content-script' && !isWindowMessagingAllowed)
     return
 
   if (data.cmd === '__crx_bridge_verify_listening' && data.scope === namespace && data.context !== context) {
@@ -345,7 +342,7 @@ async function handleWindowOnMessage({ data, ports }: MessageEvent) {
   else if (data.cmd === '__crx_bridge_route_message' && data.scope === namespace && data.context !== context) {
     // a message event insdide `content-script` means a script inside `window` dispactched it
     // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
-    if (context === RuntimeContext.ContentScript)
+    if (context === 'content-script')
       data.payload.origin = 'window'
 
     routeMessage(data.payload)
