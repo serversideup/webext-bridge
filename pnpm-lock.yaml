@@ -8,7 +8,7 @@ specifiers:
   eslint: ^7.31.0
   nanoevents: ^6.0.0
   serialize-error: ^8.1.0
-  tiny-uuid: ^1.0.0
+  tiny-uid: ^1.1.1
   tsup: ^4.12.5
   type-fest: ^1.2.2
   typescript: ^4.3.5
@@ -17,6 +17,7 @@ specifiers:
 dependencies:
   nanoevents: 6.0.0
   serialize-error: 8.1.0
+  tiny-uid: 1.1.1
   webextension-polyfill-ts: 0.26.0
 
 devDependencies:
@@ -25,7 +26,6 @@ devDependencies:
   '@typescript-eslint/eslint-plugin': 4.28.4_b1648df9f9ba40bdeef3710a5a5af353
   '@typescript-eslint/parser': 4.28.4_eslint@7.31.0+typescript@4.3.5
   eslint: 7.31.0
-  tiny-uuid: 1.0.0
   tsup: 4.12.5_typescript@4.3.5
   type-fest: 1.2.2
   typescript: 4.3.5
@@ -2501,9 +2501,9 @@ packages:
       any-promise: 1.3.0
     dev: true
 
-  /tiny-uuid/1.0.0:
-    resolution: {integrity: sha1-rqNKL4nHtxQ16zivMTmqOgJTUco=}
-    dev: true
+  /tiny-uid/1.1.1:
+    resolution: {integrity: sha512-YRtEXpxokCLMMR46Ml/gen6jDFjZpyo9BMlEGmEpElA+zbCKtoTTikvvDTKR4Gro6tNij3ZA+60i9UiCYKKVyw==}
+    dev: false
 
   /to-fast-properties/2.0.0:
     resolution: {integrity: sha1-3F5pjL0HkmW8c+A3doGk5Og/YW4=}

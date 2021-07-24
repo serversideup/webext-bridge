@@ -117,7 +117,7 @@ Any serializable value you want to pass to other side, latter can access this va
 
 #### `destination`
 
-> Required | `string`
+> Required | `string | ` 
 
 The actual identifier of other endpoint.
 Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453`
@@ -259,7 +259,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background` or `devtools` scope, which is default setting.
 
-`window` context(s) in tab `A` get unlocked the moment you call `allowWindowMessaging(namespace)` somewhere in your extenion's content script(s) that's also loaded in tab `A`.
+`window` context(s) in tab `A` get unlocked the moment you call `allowWindowMessaging(namespace)` somewhere in your extension's content script(s) that's also loaded in tab `A`.
 
 Unlike `chrome.runtime.sendMessage` and `chrome.runtime.connect`, which requires extension's manifest to specify sites allowed to talk with the extension, `webext-bridge` has no such measure by design, which means any webpage whether you intended or not, can do `sendMessage(msgId, data, 'background')` or something similar that produces same effect, as long as it uses same protocol used by `webext-bridge` and namespace set to same as yours.
 
@@ -291,7 +291,7 @@ onMessage('getUserBrowsingHistory', (message) => {
   <br>If `window` contexts are not part of the puzzle, `webext-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `webext-bridge` hasn't been loaded in background page of your extension, which is used by `webext-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `webext-bridge` going.
 
 ```javascript
-// background.js (requires transpilation/bundling using webpack(recommended))
+// background.js (requires transpiration/bundling using webpack(recommended))
 
 import 'webext-bridge'  
 ```

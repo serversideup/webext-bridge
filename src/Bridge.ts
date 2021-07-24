@@ -1,4 +1,4 @@
-import uuid from 'tiny-uuid'
+import uuid from 'tiny-uid'
 
 import { createNanoEvents } from 'nanoevents'
 import { StreamInfo, Stream } from './Stream'

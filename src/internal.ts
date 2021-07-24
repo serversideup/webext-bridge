@@ -1,7 +1,7 @@
 import type { JsonValue } from 'type-fest'
 import { browser, Runtime } from 'webextension-polyfill-ts'
 import { serializeError } from 'serialize-error'
-import uuid from 'tiny-uuid'
+import uuid from 'tiny-uid'
 
 export type RuntimeContext = 'devtools' | 'background' | 'content-script' | 'window'
 
