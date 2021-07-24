@@ -5,6 +5,7 @@ export * from './types'
 export {
   allowWindowMessaging,
   setNamespace,
+  getCurrentContext,
 } from './internal'
 
 export {
@@ -14,8 +15,5 @@ export {
 
 export {
   sendMessage,
-} from './apis/sendMessage'
-
-export {
   onMessage,
-} from './apis/onMessage'
+} from './apis'
