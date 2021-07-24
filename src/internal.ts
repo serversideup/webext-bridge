@@ -378,7 +378,7 @@ function ensureNamespaceSet() {
     throw new Error(
       'webext-bridge uses window.postMessage to talk with other "window"(s), for message routing and stuff,'
       + 'which is global/conflicting operation in case there are other scripts using webext-bridge. '
-      + 'Call Bridge#setNamespace(nsps) to isolate your app. Example: Bridge.setNamespace(\'com.facebook.react-devtools\'). '
+      + 'Call Bridge#setNamespace(nsps) to isolate your app. Example: setNamespace(\'com.facebook.react-devtools\'). '
       + 'Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`',
     )
   }
