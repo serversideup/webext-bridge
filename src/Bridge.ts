@@ -11,7 +11,7 @@ import {
   setNamespace,
   Endpoint,
   parseEndpoint,
-  isInternalEnpoint,
+  isInternalEndpoint,
 } from './internal'
 
 const openStreams = new Map<string, Stream>()
@@ -70,7 +70,7 @@ function onOpenStreamChannel(channel: string, callback: (stream: Stream) => void
 export {
   IBridgeMessage,
   OnMessageCallback,
-  isInternalEnpoint,
+  isInternalEndpoint as isInternalEnpoint,
   sendMessage,
   onMessage,
   allowWindowMessaging,

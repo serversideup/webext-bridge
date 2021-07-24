@@ -47,7 +47,7 @@ export const parseEndpoint = (endpoint: string): Endpoint => {
   }
 }
 
-export const isInternalEnpoint = ({ context: ctx }: Endpoint): boolean =>
+export const isInternalEndpoint = ({ context: ctx }: Endpoint): boolean =>
   ['content-script', 'background', 'devtools'].includes(ctx)
 
 // Return true if the `browser` object has a specific namespace
