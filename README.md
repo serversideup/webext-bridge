@@ -26,7 +26,7 @@ import { sendMessage } from 'webext-bridge'
 
 // ...
 
-button.addEventListener('click', () => {
+button.addEventListener('click', async () => {
   const res = await sendMessage('get-selection',  { ignoreCasing: true },  'content-script')  
   console.log(res)   // > "The brown fox is alive and well"
 })
