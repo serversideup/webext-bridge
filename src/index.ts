@@ -6,6 +6,7 @@ export {
   allowWindowMessaging,
   setNamespace,
 } from './internal'
+
 export {
   parseEndpoint,
   isInternalEndpoint,

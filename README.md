@@ -1,15 +1,16 @@
 # webext-bridge
 
-Messaging in Web Extensions made super easy. Out of the box.
+Messaging in WebExtension made super easy. Out of the box.
 
 [![](https://img.shields.io/npm/v/webext-bridge?color=2B90B6&label=)](https://www.npmjs.com/package/webext-bridge)
 
 > Forked from [crx-bridge](https://github.com/NeekSandhu/crx-bridge) by [NeekSandhu](https://github.com/NeekSandhu)
 
-##### Changes in this fork
+##### Changes in this Fork
 
 - build esm instead of cjs (for better bundler optimization)
 - use `nanoevents` instead of `events` (decoupled form node module)
+- [type safe protocols](#type-safe-protcols)
 
 ----
 
@@ -56,7 +57,7 @@ onMessage('get-preferences', ({ data }) => {
 })  
 ```
 
-> Examples above require transpilation and/or bundling using `webpack`/`babel`/`rollup`
+> Examples above require transpiration and/or bundling using `webpack`/`babel`/`rollup`
 
 `webext-bridge` handles everything for you as efficiently as possible. No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `chrome.runtime.connect` ....
 
@@ -64,7 +65,7 @@ onMessage('get-preferences', ({ data }) => {
 
 - [Setup](#setup)
 - [API](#api)
-- [Behaviour](#behaviour)
+- [Behavior](#behavior)
 - [Security Note](#security)
 - [Troubleshooting](#troubleshooting)
 
@@ -78,7 +79,7 @@ onMessage('get-preferences', ({ data }) => {
 $ npm i webext-bridge
 ```
 
-### Light it up
+#### Light it up
 
 Just `import { } from 'webext-bridge'` wherever you need it and use as shown in [example above](#example)
 
@@ -89,9 +90,45 @@ Just `import { } from 'webext-bridge'` wherever you need it and use as shown in 
 
 <a name="api"></a>
 
-# API
+## Type Safe Protocols
 
-## `sendMessage(messageId: string, data: any, destination: string)`
+As we are likely to use `sendMessage` and `onMessage` in different context, keep the type consistent could be hard and easy to make mistakes. `webext-bridge` provide a smarter way to make the type for protocols much easier.
+
+Create `shim.d.ts` file with the following content and make sure it's been included in `tsconfig.json`.
+
+```ts
+// shim.d.ts
+import { ProtocolWithReturn } from 'webext-bridge'
+
+declare module 'webext-bridge' {
+  export interface ProtocolMap {
+    foo: { title: string }
+    // to specify the return type of the message,
+    // use the `ProtocolWithReturn` type wrapper
+    bar: ProtocolWithReturn<CustomDataType, CustomReturnType>
+  }
+}
+```
+
+```ts
+import { onMessage } from 'webext-bridge'
+
+onMessage('foo', ({ data }) => {
+  // type of `data` will be `{ title: string }`
+  console.log(data.title)
+}
+```
+
+```ts
+import { sendMessage } from 'webext-bridge'
+
+const returnData = await sendMessage('bar', { /* ... */ })
+// type of `returnData` will be `CustomReturnType` as specified
+```
+
+## API
+
+### `sendMessage(messageId: string, data: any, destination: string)`
 
 Sends a message to some other part of your extension, out of the box.
 
@@ -103,19 +140,19 @@ Notes:
 
 - An error thrown in listener callback (in the destination context) will behave as usual, that is, bubble up, but the same error will also be thrown where `sendMessage` was called
 
-#### `messageId`
+##### `messageId`
 
 > Required | `string`
 
 Any `string` that both sides of your extension agree on. Could be `get-flag-count` or `getFlagCount`, as long as it's same on receiver's `onMessage` listener.
 
-#### `data`
+##### `data`
 
 > Required | `any`
 
 Any serializable value you want to pass to other side, latter can access this value by refering to `data` property of first argument to `onMessage` callback function.
 
-#### `destination`
+##### `destination`
 
 > Required | `string | ` 
 
@@ -124,25 +161,25 @@ Example: `devtools` or `content-script` or `background` or `content-script@133` 
 
 `content-script`, `window` and `devtools` destinations can be suffixed with `@<tabId>` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
 
-Read `Behaviour` section to see how destinations (or endpoints) are treated.
+Read `Behavior` section to see how destinations (or endpoints) are treated.
 
 > Note: For security reasons, if you want to receive or send messages to or from `window` context, one of your extension's content script must call `allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `webext-bridge` knows which message belongs to which extension (in case multiple extensions are using `webext-bridge` in one page)
 
 ---
 
-## `onMessage(messageId: string, callback: fn)`
+### `onMessage(messageId: string, callback: fn)`
 
 Register one and only one listener, per messageId per context. That will be called upon `sendMessage` from other side.
 
 Optionally, send a response to sender by returning any value or if async a `Promise`.
 
-#### `messageId`
+##### `messageId`
 
 > Required | `string`
 
 Any `string` that both sides of your extension agree on. Could be `get-flag-count` or `getFlagCount`, as long as it's same in sender's `sendMessage` call.
 
-#### `callback`
+##### `callback`
 
 > Required | `fn`
 
@@ -154,7 +191,7 @@ Read [security note](#security) before using this.
 
 ---
 
-## `allowWindowMessaging(namespace: string)`
+### `allowWindowMessaging(namespace: string)`
 
 > Caution: Dangerous action
 
@@ -167,7 +204,7 @@ This method can be called from a content script (in top frame of tab), which ope
 Once again, `window` = the top frame of any tab. That means **allowing window messaging without checking origin first** will let JavaScript loaded at `https://evil.com` talk with your extension and possibly give indirect access to things you won't want to, like `history` API. You're expected to ensure the
 safety and privacy of your extension's users.
 
-#### `namespace`
+##### `namespace`
 
 > Required | `string`
 
@@ -175,36 +212,36 @@ Can be a domain name reversed like `com.github.facebook.react_devtools` or any `
 
 ---
 
-## `setNamespace(namespace: string)`
+### `setNamespace(namespace: string)`
 
 Applicable to scripts in top frame of loaded remote page
 
 Sets the namespace `Bridge` should use when relaying messages to and from `window` context. In a sense, it connects the callee context to the extension which called `allowWindowMessaging(<namespace: string>)` in it's content script with same namespace.
 
-#### `namespace`
+##### `namespace`
 
 > Required | `string`
 
 Can be a domain name reversed like `com.github.facebook.react_devtools` or any `uuid`. Call `setNamespace` in `window` context with same value, so that `webext-bridge` knows which payload belongs to which extension (in case there are other extensions using `webext-bridge` in a tab). Make sure namespace string is unique enough to ensure no collisions happen.
 
-## Extras
+### Extras
 
 The following API is built on top of `sendMessage` and `onMessage`, basically, it's just a wrapper, the routing and security rules still apply the same way.
 
-### `openStream(channel: string, destination: string)`
+#### `openStream(channel: string, destination: string)`
 
 Opens a `Stream` between caller and destination.
 
 Returns a `Promise` which resolves with `Stream` when the destination is ready (loaded and `onOpenStreamChannel` callback registered).
 Example below illustrates a use case for `Stream`
 
-#### `channel`
+##### `channel`
 
 > Required | `string`
 
 `Stream`(s) are strictly scoped `sendMessage`(s). Scopes could be different features of your extension that need to talk to the other side, and those scopes are named using a channel id.
 
-#### `destination`
+##### `destination`
 
 > Required | `string`
 
@@ -212,18 +249,18 @@ Same as `destination` in `sendMessage(msgId, data, destination)`
 
 ---
 
-### `onOpenStreamChannel(channel: string, callback: fn)`
+#### `onOpenStreamChannel(channel: string, callback: fn)`
 
 Registers a listener for when a `Stream` opens.
 Only one listener per channel per context
 
-#### `channel`
+##### `channel`
 
 > Required | `string`
 
 `Stream`(s) are strictly scoped `sendMessage`(s). Scopes could be different features of your extension that need to talk to the other side, and those scopes are named using a channel id.
 
-#### `callback`
+##### `callback`
 
 > Required | `fn`
 
@@ -231,7 +268,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 `Stream`(s) can be opened by a malicious webpage(s) if your extension's content script in that tab has called `allowWindowMessaging`, if working with sensitive information use `isInternalEndpoint(stream.info.endpoint)` to check, if `false` call `stream.close()` immediately.
 
-### Stream Example
+##### Stream Example
 
 ```javascript
 // background.js
@@ -241,7 +278,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 <a name="behaviour"></a>
 
-# Behaviour
+## Behavior
 
 > Following rules apply to `destination` being specified in `sendMessage(msgId, data, destination)` and `openStream(channelId, initialData, destination)`
 
@@ -255,7 +292,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 <a name="security"></a>
 
-# Serious security note
+## Serious security note
 
 The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background` or `devtools` scope, which is default setting.
 
@@ -285,7 +322,7 @@ onMessage('getUserBrowsingHistory', (message) => {
 
 <a name="troubleshooting"></a>
 
-# Troubleshooting
+## Troubleshooting
 
 - Doesn't work?
   <br>If `window` contexts are not part of the puzzle, `webext-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `webext-bridge` hasn't been loaded in background page of your extension, which is used by `webext-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `webext-bridge` going.
