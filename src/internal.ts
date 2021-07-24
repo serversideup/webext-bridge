@@ -2,7 +2,7 @@ import type { JsonValue } from 'type-fest'
 import { browser, Runtime } from 'webextension-polyfill-ts'
 import { serializeError } from 'serialize-error'
 import uuid from 'tiny-uid'
-import { Endpoint, RuntimeContext, OnMessageCallback, IQueuedMessage, IInternalMessage, IBridgeMessage } from './types'
+import { Endpoint, RuntimeContext, OnMessageCallback, IQueuedMessage, IInternalMessage, IBridgeMessage, Destination } from './types'
 
 const ENDPOINT_RE = /^((?:background$)|devtools|content-script|window)(?:@(\d+))?$/
 
@@ -56,7 +56,7 @@ initIntercoms()
  * @param data
  * @param destination
  */
-export async function sendMessage<T extends JsonValue>(messageID: string, data: JsonValue, destination: string | Endpoint): Promise<T> {
+export async function sendMessage<T extends JsonValue>(messageID: string, data: JsonValue, destination: Destination): Promise<T> {
   const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
   const errFn = 'Bridge#sendMessage ->'
 
@@ -350,4 +350,8 @@ function ensureNamespaceSet() {
       + 'Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`',
     )
   }
+}
+
+export function getCurrentContext() {
+  return context
 }

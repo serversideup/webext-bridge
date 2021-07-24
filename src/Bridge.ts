@@ -1,14 +1,11 @@
 import uuid from 'tiny-uid'
 
 import { createNanoEvents } from 'nanoevents'
-import { Stream } from './Stream'
+import { Stream } from './stream'
 import {
   sendMessage,
   onMessage,
-  allowWindowMessaging,
-  setNamespace,
   parseEndpoint,
-  isInternalEndpoint,
 } from './internal'
 import {
   IBridgeMessage,
@@ -72,11 +69,15 @@ function onOpenStreamChannel(channel: string, callback: (stream: Stream) => void
 export {
   IBridgeMessage,
   OnMessageCallback,
-  isInternalEndpoint as isInternalEnpoint,
+  openStream,
+  onOpenStreamChannel,
+}
+
+export {
   sendMessage,
   onMessage,
   allowWindowMessaging,
   setNamespace,
-  openStream,
-  onOpenStreamChannel,
-}
+  parseEndpoint,
+  isInternalEndpoint,
+} from './internal'
