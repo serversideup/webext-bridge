@@ -1,18 +1,20 @@
 import uuid from 'tiny-uid'
 
 import { createNanoEvents } from 'nanoevents'
-import { StreamInfo, Stream } from './Stream'
+import { Stream } from './Stream'
 import {
-  IBridgeMessage,
-  OnMessageCallback,
   sendMessage,
   onMessage,
   allowWindowMessaging,
   setNamespace,
-  Endpoint,
   parseEndpoint,
   isInternalEndpoint,
 } from './internal'
+import {
+  IBridgeMessage,
+  StreamInfo,
+  OnMessageCallback, Endpoint, RuntimeContext,
+} from './types'
 
 const openStreams = new Map<string, Stream>()
 const onOpenStreamCallbacks = new Map<string, (stream: Stream) => void>()
@@ -45,7 +47,7 @@ onMessage<{ channel: string; streamId: string }>('__crx_bridge_stream_open__', (
   })
 })
 
-async function openStream(channel: string, destination: string | Endpoint): Promise<Stream> {
+async function openStream(channel: string, destination: RuntimeContext | Endpoint | string): Promise<Stream> {
   if (openStreams.has(channel))
     throw new Error('webext-bridge: A Stream is already open at this channel')
 

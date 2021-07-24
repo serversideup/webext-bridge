@@ -2,19 +2,8 @@ import { createNanoEvents } from 'nanoevents'
 import type { Emitter } from 'nanoevents'
 import type { JsonValue } from 'type-fest'
 
-import { Endpoint, onMessage, sendMessage } from './internal'
-
-export type StreamInfo = {
-  streamId: string
-  channel: string
-  endpoint: Endpoint
-}
-
-export type HybridUnsubscriber = {
-  (): void
-  dispose: () => void
-  close: () => void
-}
+import { onMessage, sendMessage } from './internal'
+import { HybridUnsubscriber, StreamInfo } from './types'
 
 /**
  * Built on top of Bridge. Nothing much special except that Stream allows
