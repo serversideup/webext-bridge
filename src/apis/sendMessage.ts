@@ -13,10 +13,16 @@ import { parseEndpoint } from '../utils'
  * extensions using webext-bridge as well
  * @param messageID
  * @param data
- * @param destination
+ * @param destination default 'background'
  */
-
-export async function sendMessage<ReturnType extends JsonValue, K extends DataTypeKey | string>(messageID: K, data: GetDataType<K, JsonValue>, destination: Destination) {
+export async function sendMessage<
+  ReturnType extends JsonValue,
+  K extends DataTypeKey | string
+>(
+  messageID: K,
+  data: GetDataType<K, JsonValue>,
+  destination: Destination = 'background',
+) {
   const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
   const errFn = 'Bridge#sendMessage ->'
 
