@@ -61,17 +61,7 @@ onMessage('get-preferences', ({ data }) => {
 
 `webext-bridge` handles everything for you as efficiently as possible. No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `chrome.runtime.connect` ....
 
-# Contents
-
-- [Setup](#setup)
-- [API](#api)
-- [Behavior](#behavior)
-- [Security Note](#security)
-- [Troubleshooting](#troubleshooting)
-
-<a name="setup"></a>
-
-# Setup
+## Setup
 
 ### Install
 
