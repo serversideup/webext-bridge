@@ -2,26 +2,10 @@ import type { JsonValue } from 'type-fest'
 import { browser, Runtime } from 'webextension-polyfill-ts'
 import { serializeError } from 'serialize-error'
 import uuid from 'tiny-uid'
-import { Endpoint, RuntimeContext, OnMessageCallback, IQueuedMessage, IInternalMessage, IBridgeMessage, Destination } from './types'
+import { RuntimeContext, OnMessageCallback, IQueuedMessage, IInternalMessage, IBridgeMessage } from './types'
+import { hasAPI, parseEndpoint } from './utils'
 
-const ENDPOINT_RE = /^((?:background$)|devtools|content-script|window)(?:@(\d+))?$/
-
-export const parseEndpoint = (endpoint: string): Endpoint => {
-  const [, context, tabId] = endpoint.match(ENDPOINT_RE) || []
-
-  return {
-    context: context as RuntimeContext,
-    tabId: +tabId,
-  }
-}
-
-export const isInternalEndpoint = ({ context: ctx }: Endpoint): boolean =>
-  ['content-script', 'background', 'devtools'].includes(ctx)
-
-// Return true if the `browser` object has a specific namespace
-const hasAPI = (nsps: string): boolean => browser[nsps]
-
-const context: RuntimeContext
+export const context: RuntimeContext
 = hasAPI('devtools')
   ? 'devtools'
   : hasAPI('tabs')
@@ -33,8 +17,8 @@ const context: RuntimeContext
         : null
 
 const runtimeId: string = uuid()
-const openTransactions = new Map<string, { resolve: (v: void | JsonValue | PromiseLike<JsonValue>) => void; reject: (e: JsonValue) => void }>()
-const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
+export const openTransactions = new Map<string, { resolve: (v: void | JsonValue | PromiseLike<JsonValue>) => void; reject: (e: JsonValue) => void }>()
+export const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
 const messageQueue = new Set<IQueuedMessage>()
 const portMap = new Map<string, Runtime.Port>()
 let port: Runtime.Port = null
@@ -44,51 +28,6 @@ let namespace: string
 let isWindowMessagingAllowed: boolean
 
 initIntercoms()
-
-/**
- * Sends a message to some other endpoint, to which only one listener can send response.
- * Returns Promise. Use `then` or `await` to wait for the response.
- * If destination is `window` message will routed using window.postMessage.
- * Which requires a shared namespace to be set between `content-script` and `window`
- * that way they can recognize each other when global window.postMessage happens and there are other
- * extensions using webext-bridge as well
- * @param messageID
- * @param data
- * @param destination
- */
-export async function sendMessage<T extends JsonValue>(messageID: string, data: JsonValue, destination: Destination): Promise<T> {
-  const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
-  const errFn = 'Bridge#sendMessage ->'
-
-  if (!endpoint.context)
-    throw new TypeError(`${errFn} Destination must be any one of known destinations`)
-
-  if (context === 'background') {
-    const { context: dest, tabId: destTabId } = endpoint
-    if (dest !== 'background' && !destTabId)
-      throw new TypeError(`${errFn} When sending messages from background page, use @tabId syntax to target specific tab`)
-  }
-
-  return new Promise<T>((resolve, reject) => {
-    const payload: IInternalMessage = {
-      messageID,
-      data,
-      destination: endpoint,
-      messageType: 'message',
-      transactionId: uuid(),
-      origin: { context, tabId: null },
-      hops: [],
-      timestamp: Date.now(),
-    }
-
-    openTransactions.set(payload.transactionId, { resolve, reject })
-    routeMessage(payload)
-  })
-}
-
-export function onMessage<T extends JsonValue>(messageID: string, callback: OnMessageCallback<T>): void {
-  onMessageListeners.set(messageID, callback)
-}
 
 export function setNamespace(nsps: string): void {
   namespace = nsps
@@ -164,7 +103,7 @@ function initIntercoms() {
   }
 }
 
-function routeMessage(message: IInternalMessage): void | Promise<void> {
+export function routeMessage(message: IInternalMessage): void | Promise<void> {
   const { origin, destination } = message
 
   if (message.hops.includes(runtimeId))
@@ -308,7 +247,7 @@ async function handleWindowOnMessage({ data, ports }: MessageEvent) {
     msgPort.postMessage(true)
   }
   else if (data.cmd === '__crx_bridge_route_message' && data.scope === namespace && data.context !== context) {
-    // a message event insdide `content-script` means a script inside `window` dispactched it
+    // a message event inside `content-script` means a script inside `window` dispatched it
     // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
     if (context === 'content-script')
       data.payload.origin = 'window'

@@ -2,7 +2,8 @@ import { createNanoEvents } from 'nanoevents'
 import type { Emitter } from 'nanoevents'
 import type { JsonValue } from 'type-fest'
 
-import { onMessage, sendMessage } from './internal'
+import { onMessage } from './apis/onMessage'
+import { sendMessage } from './apis/sendMessage'
 import { HybridUnsubscriber, StreamInfo } from './types'
 
 /**
@@ -24,7 +25,7 @@ class Stream {
     this.isClosed = false
 
     if (!Stream.initDone) {
-      onMessage<{ streamId: string; action: 'transfer' | 'close'; streamTransfer: JsonValue }>('__crx_bridge_stream_transfer__', (msg) => {
+      onMessage<{ streamId: string; action: 'transfer' | 'close'; streamTransfer: JsonValue }, string>('__crx_bridge_stream_transfer__', (msg) => {
         const { streamId, streamTransfer, action } = msg.data
         const stream = Stream.openStreams.get(streamId)
         if (stream && !stream.isClosed) {
@@ -113,11 +114,11 @@ class Stream {
   }
 
   private getDisposable(event: string, callback: () => void): HybridUnsubscriber {
-    const unsub = this.emitter.on(event, callback)
+    const off = this.emitter.on(event, callback)
 
-    return Object.assign(unsub, {
-      dispose: unsub,
-      close: unsub,
+    return Object.assign(off, {
+      dispose: off,
+      close: off,
     })
   }
 }

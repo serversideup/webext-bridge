@@ -46,3 +46,42 @@ export type HybridUnsubscriber = {
 }
 
 export type Destination = Endpoint | RuntimeContext | string
+
+declare const ProtocolWithReturnSymbol: unique symbol
+
+export interface ProtocolWithReturn<Data extends JsonValue, Return extends JsonValue> {
+  data: Data
+  return: Return
+  /**
+   * Type differentiator only.
+   */
+  [ProtocolWithReturnSymbol]: true
+}
+
+/**
+ * Extendable by user.
+ */
+export interface ProtocolMap {
+  // foo: { id: number, name: string }
+  // bar: ProtocolWithReturn<string, number>
+}
+
+export type DataTypeKey = keyof ProtocolMap
+
+export type GetDataType<
+  K extends DataTypeKey | string,
+  Fallback extends JsonValue
+> = K extends DataTypeKey
+  ? ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
+    ? Data
+    : ProtocolMap[K]
+  : Fallback
+
+export type GetReturnType<
+  K extends DataTypeKey | string,
+  Fallback extends JsonValue
+> = K extends DataTypeKey
+  ? ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
+    ? Return
+    : void
+  : Fallback

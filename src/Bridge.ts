@@ -2,22 +2,19 @@ import uuid from 'tiny-uid'
 
 import { createNanoEvents } from 'nanoevents'
 import { Stream } from './stream'
+import { parseEndpoint } from './utils'
+import { onMessage } from './apis/onMessage'
+import { sendMessage } from './apis/sendMessage'
 import {
-  sendMessage,
-  onMessage,
-  parseEndpoint,
-} from './internal'
-import {
-  IBridgeMessage,
   StreamInfo,
-  OnMessageCallback, Endpoint, RuntimeContext,
+  Endpoint, RuntimeContext,
 } from './types'
 
 const openStreams = new Map<string, Stream>()
 const onOpenStreamCallbacks = new Map<string, (stream: Stream) => void>()
 const streamyEmitter = createNanoEvents()
 
-onMessage<{ channel: string; streamId: string }>('__crx_bridge_stream_open__', (message) => {
+onMessage<{ channel: string; streamId: string }, string>('__crx_bridge_stream_open__', (message) => {
   return new Promise((resolve) => {
     const { sender, data } = message
     const { channel } = data
@@ -67,17 +64,6 @@ function onOpenStreamChannel(channel: string, callback: (stream: Stream) => void
 }
 
 export {
-  IBridgeMessage,
-  OnMessageCallback,
   openStream,
   onOpenStreamChannel,
 }
-
-export {
-  sendMessage,
-  onMessage,
-  allowWindowMessaging,
-  setNamespace,
-  parseEndpoint,
-  isInternalEndpoint,
-} from './internal'
