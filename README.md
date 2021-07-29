@@ -10,7 +10,7 @@ Messaging in WebExtension made super easy. Out of the box.
 
 - build esm instead of cjs (for better bundler optimization)
 - use `nanoevents` instead of `events` (decoupled form node module)
-- [type safe protocols](#type-safe-protcols)
+- [type safe protocols](#type-safe-protocols)
 
 ----
 
