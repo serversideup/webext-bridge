@@ -1,6 +1,6 @@
 {
   "name": "webext-bridge",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Messaging in Web Extensions made easy. Out of the box.",
   "keywords": [
     "chrome",
