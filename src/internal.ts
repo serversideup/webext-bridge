@@ -238,6 +238,8 @@ async function handleInboundMessage(message: IInternalMessage) {
   }
 }
 
+function assertInternalMessage(msg: any): asserts msg is IInternalMessage {}
+
 async function handleWindowOnMessage({ data, ports }: MessageEvent) {
   if (context === 'content-script' && !isWindowMessagingAllowed)
     return
@@ -247,12 +249,18 @@ async function handleWindowOnMessage({ data, ports }: MessageEvent) {
     msgPort.postMessage(true)
   }
   else if (data.cmd === '__crx_bridge_route_message' && data.scope === namespace && data.context !== context) {
+    const { payload } = data
+    assertInternalMessage(payload)
     // a message event inside `content-script` means a script inside `window` dispatched it
     // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
-    if (context === 'content-script')
-      data.payload.origin = 'window'
+    if (context === 'content-script') {
+      payload.origin = {
+        context: 'window',
+        tabId: null,
+      }
+    }
 
-    routeMessage(data.payload)
+    routeMessage(payload)
   }
 }
 
