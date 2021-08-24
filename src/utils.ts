@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { Endpoint, RuntimeContext } from './types'
 
 const ENDPOINT_RE = /^((?:background$)|devtools|content-script|window)(?:@(\d+))?$/

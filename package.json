@@ -37,19 +37,21 @@
   },
   "homepage": "https://github.com/antfu/webext-bridge#readme",
   "dependencies": {
+    "@types/webextension-polyfill": "^0.8.0",
     "nanoevents": "^6.0.0",
     "serialize-error": "^8.1.0",
     "tiny-uid": "^1.1.1",
-    "webextension-polyfill-ts": "^0.26.0"
+    "webextension-polyfill": "^0.8.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.7.0",
-    "@types/node": "^16.4.1",
-    "@typescript-eslint/eslint-plugin": "^4.28.4",
-    "@typescript-eslint/parser": "^4.28.4",
-    "eslint": "^7.31.0",
-    "tsup": "^4.12.5",
-    "type-fest": "^1.2.2",
+    "@types/node": "^16.7.1",
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
+    "bumpp": "^6.0.6",
+    "eslint": "^7.32.0",
+    "tsup": "^4.14.0",
+    "type-fest": "^2.1.0",
     "typescript": "^4.3.5"
   }
 }

@@ -1,5 +1,5 @@
 import type { JsonValue } from 'type-fest'
-import { browser, Runtime } from 'webextension-polyfill-ts'
+import browser, { Runtime } from 'webextension-polyfill'
 import { serializeError } from 'serialize-error'
 import uuid from 'tiny-uid'
 import { RuntimeContext, OnMessageCallback, IQueuedMessage, IInternalMessage, IBridgeMessage } from './types'
