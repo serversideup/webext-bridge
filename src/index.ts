@@ -1,5 +1,5 @@
-export { Stream } from './Stream'
-export * from './Bridge'
+export { Stream } from './stream'
+export * from './bridge'
 export * from './types'
 
 export {
