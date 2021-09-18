@@ -1,7 +1,7 @@
 import uuid from 'tiny-uid'
 
 import { createNanoEvents } from 'nanoevents'
-import { Stream } from './stream'
+import { Stream } from './Stream'
 import { parseEndpoint } from './utils'
 import { onMessage } from './apis/onMessage'
 import { sendMessage } from './apis/sendMessage'
