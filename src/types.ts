@@ -1,6 +1,6 @@
 import { JsonValue } from 'type-fest'
 
-export type RuntimeContext = 'devtools' | 'background' | 'content-script' | 'window'
+export type RuntimeContext = 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window'
 
 export type Endpoint = {
   context: RuntimeContext

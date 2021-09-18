@@ -3,13 +3,13 @@ import browser, { Runtime } from 'webextension-polyfill'
 import { serializeError } from 'serialize-error'
 import uuid from 'tiny-uid'
 import { RuntimeContext, OnMessageCallback, IQueuedMessage, IInternalMessage, IBridgeMessage } from './types'
-import { hasAPI, parseEndpoint } from './utils'
+import { hasAPI, parseEndpoint, getBackgroundPageType } from './utils'
 
 export const context: RuntimeContext
 = hasAPI('devtools')
   ? 'devtools'
   : hasAPI('tabs')
-    ? 'background'
+    ? getBackgroundPageType()
     : hasAPI('extension')
       ? 'content-script'
       : (typeof document !== 'undefined')
@@ -67,15 +67,29 @@ function initIntercoms() {
     })
   }
 
+  if (context === 'popup' || context === 'options') {
+    const name = `${context}`
+
+    port = browser.runtime.connect(undefined, { name })
+
+    port.onMessage.addListener((message: IInternalMessage) => {
+      routeMessage(message)
+    })
+
+    port.onDisconnect.addListener(() => {
+      port = null
+    })
+  }
+
   if (context === 'background') {
     browser.runtime.onConnect.addListener((incomingPort) => {
       // when coming from devtools, it's should pre-fabricated with inspected tab as linked tab id
       const portId = incomingPort.name || `content-script@${incomingPort.sender.tab.id}`
       // literal tab id in case of content script, however tab id of inspected page in case of devtools context
-      const { tabId: linkedTabId } = parseEndpoint(portId)
+      const { context, tabId: linkedTabId } = parseEndpoint(portId)
 
       // in-case the port handshake is from something else
-      if (!linkedTabId)
+      if (!linkedTabId && context !== 'popup' && context !== 'options')
         return
 
       portMap.set(portId, incomingPort)
@@ -130,7 +144,7 @@ export function routeMessage(message: IInternalMessage): void | Promise<void> {
       return routeMessageThroughWindow(window, message)
     }
 
-    else if (context === 'devtools' || context === 'content-script') {
+    else if (['devtools', 'content-script', 'popup', 'options'].includes(context)) {
       if (destination.context === 'background')
         message.destination = null
 
