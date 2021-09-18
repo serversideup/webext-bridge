@@ -168,7 +168,9 @@ export function routeMessage(message: IInternalMessage): void | Promise<void> {
       }
 
       // As far as background page is concerned, it just needs to know the which `content-script` or `devtools` should it forward to
-      const resolvedDestination = `${(destName === 'window' ? 'content-script' : destName)}@${(destTabId || srcTabId)}`
+      const resolvedDestination = ['popup', 'options'].includes(destName)
+        ? destName
+        : (`${(destName === 'window' ? 'content-script' : destName)}@${(destTabId || srcTabId)}`)
       const destPort = portMap.get(resolvedDestination)
 
       if (destPort)
