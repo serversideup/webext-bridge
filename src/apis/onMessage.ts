@@ -1,5 +1,5 @@
 import { JsonValue } from 'type-fest'
-import { GetDataType, OnMessageCallback, DataTypeKey } from '../types'
+import { GetDataType, GetReturnType, OnMessageCallback, DataTypeKey } from '../types'
 import { onMessageListeners } from '../internal'
 
 export function onMessage<
@@ -7,7 +7,7 @@ export function onMessage<
   K extends DataTypeKey | string
 >(
   messageID: K,
-  callback: OnMessageCallback<GetDataType<K, Data>>,
+  callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>,
 ): void {
   onMessageListeners.set(messageID, callback)
 }

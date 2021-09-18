@@ -14,7 +14,7 @@ export interface IBridgeMessage<T extends JsonValue> {
   timestamp: number
 }
 
-export type OnMessageCallback<T extends JsonValue> = (message: IBridgeMessage<T>) => void | JsonValue | Promise<JsonValue>
+export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (message: IBridgeMessage<T>) => R | Promise<R>
 
 export interface IInternalMessage {
   origin: Endpoint
