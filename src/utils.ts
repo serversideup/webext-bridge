@@ -20,8 +20,11 @@ export const hasAPI = (nsps: string): boolean => browser[nsps]
 export const getBackgroundPageType = () => {
   const manifest: Manifest.WebExtensionManifest = browser.runtime.getManifest()
 
-  if (manifest.browser_action?.default_popup) {
-    const url = new URL(browser.runtime.getURL(manifest.browser_action.default_popup))
+  if (typeof window === 'undefined') return 'background'
+
+  const popupPage = manifest.browser_action?.default_popup || manifest.action?.default_popup
+  if (popupPage) {
+    const url = new URL(browser.runtime.getURL(popupPage))
     if (url.pathname === window.location.pathname) return 'popup'
   }
 
