@@ -57,7 +57,7 @@ onMessage('get-preferences', ({ data }) => {
 })  
 ```
 
-> Examples above require transpiration and/or bundling using `webpack`/`babel`/`rollup`
+> Examples above require transpilation and/or bundling using `webpack`/`babel`/`rollup`
 
 `webext-bridge` handles everything for you as efficiently as possible. No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `chrome.runtime.connect` ....
 
