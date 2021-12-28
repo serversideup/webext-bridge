@@ -5,6 +5,7 @@ export type RuntimeContext = 'devtools' | 'background' | 'popup' | 'options' | '
 export type Endpoint = {
   context: RuntimeContext
   tabId: number
+  frameId?: number
 }
 
 export interface IBridgeMessage<T extends JsonValue> {

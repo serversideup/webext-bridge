@@ -151,6 +151,8 @@ Example: `devtools` or `content-script` or `background` or `content-script@133` 
 
 `content-script`, `window` and `devtools` destinations can be suffixed with `@<tabId>` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
 
+For `content-script`, a specific `frameId` can be specified by appending the `frameId` to the suffix `@<tabId>.<frameId>`.
+
 Read `Behavior` section to see how destinations (or endpoints) are treated.
 
 > Note: For security reasons, if you want to receive or send messages to or from `window` context, one of your extension's content script must call `allowWindowMessaging(<namespace: string>)` to unlock message routing. Also call `setNamespace(<namespace: string>)` in those `window` contexts. Use same namespace string in those two calls, so `webext-bridge` knows which message belongs to which extension (in case multiple extensions are using `webext-bridge` in one page)
