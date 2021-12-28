@@ -21,6 +21,7 @@ export const openTransactions = new Map<string, { resolve: (v: void | JsonValue 
 export const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
 const messageQueue = new Set<IQueuedMessage>()
 const portMap = new Map<string, Runtime.Port>()
+
 let port: Runtime.Port = null
 
 // these facilitate communication with window contexts ("injected scripts")
@@ -46,6 +47,15 @@ function initIntercoms() {
     window.addEventListener('message', handleWindowOnMessage)
 
   if (context === 'content-script' && top === window) {
+    port = browser.runtime.connect()
+    port.onMessage.addListener((message: IInternalMessage) => {
+      routeMessage(message)
+    })
+  }
+
+  if (context === 'content-script' && top !== window) {
+    // This check will pass only if this is run inside an iframe. This is not necessary,
+    // as it does the same as the above, but the `top === window` can be important in the future.
     port = browser.runtime.connect()
     port.onMessage.addListener((message: IInternalMessage) => {
       routeMessage(message)
@@ -84,7 +94,14 @@ function initIntercoms() {
   if (context === 'background') {
     browser.runtime.onConnect.addListener((incomingPort) => {
       // when coming from devtools, it's should pre-fabricated with inspected tab as linked tab id
-      const portId = incomingPort.name || `content-script@${incomingPort.sender.tab.id}`
+
+      let portId = incomingPort.name || `content-script@${incomingPort.sender.tab.id}`
+
+      const portFrame = incomingPort.sender.frameId
+
+      if (portFrame)
+        portId = `${portId}.${portFrame}`
+
       // literal tab id in case of content script, however tab id of inspected page in case of devtools context
       const { context, tabId: linkedTabId } = parseEndpoint(portId)
 
@@ -153,7 +170,7 @@ export function routeMessage(message: IInternalMessage): void | Promise<void> {
     }
 
     else if (context === 'background') {
-      const { context: destName, tabId: destTabId } = destination
+      const { context: destName, tabId: destTabId, frameId: destFrameId } = destination
       const { tabId: srcTabId } = origin
 
       // remove the destination in case the message isn't going to `window`; it'll be forwarded to either `content-script` or `devtools`...
@@ -168,9 +185,15 @@ export function routeMessage(message: IInternalMessage): void | Promise<void> {
       }
 
       // As far as background page is concerned, it just needs to know the which `content-script` or `devtools` should it forward to
-      const resolvedDestination = ['popup', 'options'].includes(destName)
+
+      let resolvedDestination = ['popup', 'options'].includes(destName)
         ? destName
         : (`${(destName === 'window' ? 'content-script' : destName)}@${(destTabId || srcTabId)}`)
+
+      // Here it is checked if a specific frame needs to receive the message
+      if (destFrameId)
+        resolvedDestination = `${resolvedDestination}.${destFrameId}`
+
       const destPort = portMap.get(resolvedDestination)
 
       if (destPort)
