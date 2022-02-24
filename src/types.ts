@@ -1,4 +1,4 @@
-import { JsonValue } from 'type-fest'
+import { Jsonify, JsonValue } from 'type-fest'
 
 export type RuntimeContext = 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window'
 
@@ -50,9 +50,9 @@ export type Destination = Endpoint | RuntimeContext | string
 
 declare const ProtocolWithReturnSymbol: unique symbol
 
-export interface ProtocolWithReturn<Data extends JsonValue, Return extends JsonValue> {
-  data: Data
-  return: Return
+export interface ProtocolWithReturn<Data, Return> {
+  data: Jsonify<Data>
+  return: Jsonify<Return>
   /**
    * Type differentiator only.
    */
