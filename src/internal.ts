@@ -51,6 +51,10 @@ function initIntercoms() {
     port.onMessage.addListener((message: IInternalMessage) => {
       routeMessage(message)
     })
+    port.onDisconnect.addListener(() => {
+      port = null
+      initIntercoms()
+    })
   }
 
   if (context === 'content-script' && top !== window) {
@@ -59,6 +63,10 @@ function initIntercoms() {
     port = browser.runtime.connect()
     port.onMessage.addListener((message: IInternalMessage) => {
       routeMessage(message)
+    })
+    port.onDisconnect.addListener(() => {
+      port = null
+      initIntercoms()
     })
   }
 
@@ -74,6 +82,7 @@ function initIntercoms() {
 
     port.onDisconnect.addListener(() => {
       port = null
+      initIntercoms()
     })
   }
 
@@ -88,6 +97,7 @@ function initIntercoms() {
 
     port.onDisconnect.addListener(() => {
       port = null
+      initIntercoms()
     })
   }
 
