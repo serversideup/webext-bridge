@@ -21,16 +21,71 @@
     "url": "git+https://github.com/antfu/webext-bridge.git"
   },
   "author": "Neek Sandhu <neek.sandhu@outlook.com>",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts src/background.ts src/content-script.ts src/devtools.ts src/options.ts src/popup.ts src/window.ts --format esm,cjs --dts",
     "watch": "npm run build -- --watch",
     "release": "bumpp --commit --push --tag && npm run build && npm publish"
   },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./background": {
+      "import": "./dist/background.js",
+      "require": "./dist/background.cjs"
+    },
+    "./content-script": {
+      "import": "./dist/content-script.js",
+      "require": "./dist/content-script.cjs"
+    },
+    "./devtools": {
+      "import": "./dist/devtools.js",
+      "require": "./dist/devtools.cjs"
+    },
+    "./options": {
+      "import": "./dist/options.js",
+      "require": "./dist/options.cjs"
+    },
+    "./popup": {
+      "import": "./dist/popup.js",
+      "require": "./dist/popup.cjs"
+    },
+    "./window": {
+      "import": "./dist/window.js",
+      "require": "./dist/window.cjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "background": [
+        "dist/background.d.ts"
+      ],
+      "content-script": [
+        "dist/content-script.d.ts"
+      ],
+      "devtools": [
+        "dist/devtools.d.ts"
+      ],
+      "options": [
+        "dist/options.d.ts"
+      ],
+      "popup": [
+        "dist/popup.d.ts"
+      ],
+      "window": [
+        "dist/window.d.ts"
+      ]
+    }
+  },
   "files": [
-    "dist"
+    "README.md",
+    "package.json",
+    "dist/**/*"
   ],
   "bugs": {
     "url": "https://github.com/antfu/webext-bridge/issues"

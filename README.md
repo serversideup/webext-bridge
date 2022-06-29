@@ -11,6 +11,7 @@ Messaging in WebExtension made super easy. Out of the box.
 - build esm instead of cjs (for better bundler optimization)
 - use `nanoevents` instead of `events` (decoupled form node module)
 - [type safe protocols](#type-safe-protocols)
+- See more in `CHANGELOG.md`
 
 ----
 
@@ -22,7 +23,7 @@ This much
 
 ```javascript
 // Inside devtools script
-import { sendMessage } from 'webext-bridge'
+import { sendMessage } from 'webext-bridge/devtools'
 
 // ...
 
@@ -34,7 +35,7 @@ button.addEventListener('click', async () => {
 
 ```javascript
 // Inside content script
-import { sendMessage, onMessage } from 'webext-bridge'  
+import { sendMessage, onMessage } from 'webext-bridge/content-script'
 
 onMessage('get-selection', async (message) => {
   const { sender, data: { ignoreCasing } } = message  
@@ -48,7 +49,7 @@ onMessage('get-selection', async (message) => {
 
 ```javascript
 // Inside background script
-import { onMessage } from 'webext-bridge'  
+import { onMessage } from 'webext-bridge/background'
 
 onMessage('get-preferences', ({ data }) => {
   const { sync } = data  
@@ -71,7 +72,7 @@ $ npm i webext-bridge
 
 #### Light it up
 
-Just `import { } from 'webext-bridge'` wherever you need it and use as shown in [example above](#example)
+Just `import { } from 'webext-bridge/{context}'` wherever you need it and use as shown in [example above](#example)
 
 > Even if your extension doesn't need a background page or wont be sending/receiving messages in background script.
 > <br> `webext-bridge` uses background/event context as staging area for messages, therefore it **must** loaded in background/event page for it to work.
@@ -101,7 +102,7 @@ declare module 'webext-bridge' {
 ```
 
 ```ts
-import { onMessage } from 'webext-bridge'
+import { onMessage } from 'webext-bridge/content-script'
 
 onMessage('foo', ({ data }) => {
   // type of `data` will be `{ title: string }`
@@ -110,7 +111,7 @@ onMessage('foo', ({ data }) => {
 ```
 
 ```ts
-import { sendMessage } from 'webext-bridge'
+import { sendMessage } from 'webext-bridge/background'
 
 const returnData = await sendMessage('bar', { /* ... */ })
 // type of `returnData` will be `CustomReturnType` as specified
@@ -187,7 +188,7 @@ Read [security note](#security) before using this.
 
 > Caution: Dangerous action
 
-Applicable to content scripts (noop if called from anywhere else)
+API available only to content scripts
 
 Unlocks the transmission of messages to and from `window` (top frame of loaded page) contexts in the tab where it is called.
 `webext-bridge` by default won't transmit any payload to or from `window` contexts for security reasons.
@@ -206,7 +207,7 @@ Can be a domain name reversed like `com.github.facebook.react_devtools` or any `
 
 ### `setNamespace(namespace: string)`
 
-Applicable to scripts in top frame of loaded remote page
+API available to scripts in top frame of loaded remote page
 
 Sets the namespace `Bridge` should use when relaying messages to and from `window` context. In a sense, it connects the callee context to the extension which called `allowWindowMessaging(<namespace: string>)` in it's content script with same namespace.
 
@@ -274,7 +275,8 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 > Following rules apply to `destination` being specified in `sendMessage(msgId, data, destination)` and `openStream(channelId, initialData, destination)`
 
-- Specifying `devtools` as destination from `content-script` will auto-route payload to inspecting `devtools` page if open and listening.
+- Specifying `devtools` as destination from `content-script` will auto-route payload to inspecting `devtools` page if open and listening. If devtools are not open, message will be queued up and
+delivered when devtools are opened and the user switches to your extension's devtools panel.
 
 - Specifying `content-script` as destination from `devtools` will auto-route the message to inspected window's top `content-script` page if listening. If page is loading, message will be queued up and delivered when page is ready and listening.
 
@@ -322,7 +324,7 @@ onMessage('getUserBrowsingHistory', (message) => {
 ```javascript
 // background.js (requires transpiration/bundling using webpack(recommended))
 
-import 'webext-bridge'  
+import 'webext-bridge/background'
 ```
 
 ```javascript

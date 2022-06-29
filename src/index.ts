@@ -1,19 +1,3 @@
-export { Stream } from './stream'
-export * from './bridge'
 export * from './types'
-
-export {
-  allowWindowMessaging,
-  setNamespace,
-  getCurrentContext,
-} from './internal'
-
-export {
-  parseEndpoint,
-  isInternalEndpoint,
-} from './utils'
-
-export {
-  sendMessage,
-  onMessage,
-} from './apis'
+export { isInternalEndpoint } from './internal/is-internal-endpoint'
+export { parseEndpoint } from './internal/parse-endpoint'
