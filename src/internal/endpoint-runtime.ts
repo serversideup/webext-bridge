@@ -5,12 +5,12 @@ import type { DataTypeKey, Destination, GetDataType, GetReturnType, IBridgeMessa
 import { parseEndpoint } from './parse-endpoint'
 
 export interface EndpointRuntime {
-  sendMessage: <ReturnType extends JsonValue, K extends DataTypeKey | string = string>(
+  sendMessage: <ReturnType extends JsonValue, K extends DataTypeKey = DataTypeKey>(
     messageID: K,
     data: GetDataType<K, JsonValue>,
     destination?: Destination,
   ) => Promise<GetReturnType<K, ReturnType>>
-  onMessage: <Data extends JsonValue, K extends DataTypeKey | string = string>(
+  onMessage: <Data extends JsonValue, K extends DataTypeKey = DataTypeKey>(
     messageID: K,
     callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>
   ) => void
@@ -22,7 +22,7 @@ export interface EndpointRuntime {
 
 export const createEndpointRuntime = (thisContext: RuntimeContext, routeMessage: (msg: IInternalMessage) => void): EndpointRuntime => {
   const runtimeId = uuid()
-  const openTransactions = new Map<string, { resolve: (v: void | JsonValue | PromiseLike<JsonValue>) => void; reject: (e: JsonValue) => void }>()
+  const openTransactions = new Map<string, { resolve: (v: unknown) => void; reject: (e: unknown) => void }>()
   const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
 
   const handleMessage = (message: IInternalMessage) => {
