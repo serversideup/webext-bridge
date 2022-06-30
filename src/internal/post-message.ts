@@ -1,72 +1,37 @@
 import type { IInternalMessage } from '../types'
+import { getMessagePort } from './message-port'
 
 export const usePostMessaging = (thisContext: 'window' | 'content-script') => {
   let allocatedNamespace: string
   let messagingEnabled = false
   let onMessageCallback: (msg: IInternalMessage) => void
-
-  window.addEventListener('message', (event) => {
-    if (!messagingEnabled)
-      return
-
-    const { data, ports } = event
-
-    if (data.scope !== allocatedNamespace || data.context === thisContext)
-      return
-
-    switch (data.cmd) {
-      case '__crx_bridge_verify_listening': {
-        const msgPort: MessagePort = ports[0]
-        msgPort.postMessage(true)
-        break
-      }
-
-      case '__crx_bridge_message': {
-        const { payload } = data
-
-        onMessageCallback?.(payload)
-        break
-      }
-    }
-  })
-
-  const postMessage = (msg: IInternalMessage) => {
-    if (!messagingEnabled)
-      return
-
-    if (thisContext !== 'content-script' && thisContext !== 'window')
-      throw new Error('Endpoint does not use postMessage')
-
-    ensureNamespaceSet(allocatedNamespace)
-
-    const channel = new MessageChannel()
-    const retry = setTimeout(() => {
-      channel.port1.onmessage = null
-      postMessage(msg)
-    }, 300)
-
-    channel.port1.onmessage = () => {
-      clearTimeout(retry)
-      window.postMessage({
-        cmd: '__crx_bridge_message',
-        scope: allocatedNamespace,
-        context: thisContext,
-        payload: msg,
-      }, '*')
-    }
-
-    window.postMessage({
-      cmd: '__crx_bridge_verify_listening',
-      scope: allocatedNamespace,
-      context: thisContext,
-    }, '*', [channel.port2])
-  }
+  let portP: Promise<MessagePort>
 
   return {
-    postMessage,
     enable: () => messagingEnabled = true,
-    setNamespace: (nsps: string) => allocatedNamespace = nsps,
     onMessage: (cb: typeof onMessageCallback) => onMessageCallback = cb,
+    postMessage: async(msg: IInternalMessage) => {
+      if (thisContext !== 'content-script' && thisContext !== 'window')
+        throw new Error('Endpoint does not use postMessage')
+
+      if (!messagingEnabled)
+        throw new Error('Communication with window has not been allowed')
+
+      ensureNamespaceSet(allocatedNamespace)
+
+      return (await portP).postMessage(msg)
+    },
+    setNamespace: (nsps: string) => {
+      if (allocatedNamespace)
+        throw new Error('Namespace once set cannot be changed')
+
+      allocatedNamespace = nsps
+      portP = getMessagePort(
+        thisContext,
+        nsps,
+        ({ data }) => onMessageCallback?.(data),
+      )
+    },
   }
 }
 
