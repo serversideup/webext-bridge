@@ -17,8 +17,8 @@ export const context: RuntimeContext
         : null
 
 const runtimeId: string = uuid()
-export const openTransactions = new Map<string, { resolve: (v: void | JsonValue | PromiseLike<JsonValue>) => void; reject: (e: JsonValue) => void }>()
-export const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
+export const openTransactions = new Map<string, { resolve: (v: unknown) => void; reject: (e: unknown) => void }>()
+export const onMessageListeners = new Map<string, OnMessageCallback<unknown, unknown>>()
 const messageQueue = new Set<IQueuedMessage>()
 const portMap = new Map<string, Runtime.Port>()
 
@@ -240,7 +240,7 @@ async function handleInboundMessage(message: IInternalMessage) {
   }
 
   const handleNewMessage = async() => {
-    let reply: JsonValue | void
+    let reply: unknown
     let err: Error
     let noHandlerFoundError = false
 

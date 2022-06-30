@@ -15,7 +15,7 @@ export interface IBridgeMessage<T extends JsonValue> {
   timestamp: number
 }
 
-export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (message: IBridgeMessage<T>) => R | Promise<R>
+export type OnMessageCallback<T, R> = (message: IBridgeMessage<T>) => R | Promise<R>
 
 export interface IInternalMessage {
   origin: Endpoint
@@ -25,7 +25,7 @@ export interface IInternalMessage {
   messageID: string
   messageType: 'message' | 'reply'
   err?: JsonValue
-  data?: JsonValue | void
+  data?: unknown
   timestamp: number
 }
 
@@ -63,26 +63,24 @@ export interface ProtocolWithReturn<Data, Return> {
  * Extendable by user.
  */
 export interface ProtocolMap {
-  // foo: { id: number, name: string }
+  __crx_bridge_stream_open__: ProtocolWithReturn<{ channel: string; streamId: string }, boolean>
+  __crx_bridge_stream_transfer__: { streamId: string; action: 'transfer' | 'close'; streamTransfer: JsonValue }
+  // foo: { id: number; name: string; }
   // bar: ProtocolWithReturn<string, number>
 }
 
 export type DataTypeKey = keyof ProtocolMap
 
+type ValidateJsonValue<T> = T extends JsonValue ? T : 'This value is not a serializable JSON value'
+
 export type GetDataType<
-  K extends DataTypeKey | string,
-  Fallback extends JsonValue
-> = K extends DataTypeKey
-  ? ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
-    ? Data
-    : ProtocolMap[K]
-  : Fallback
+  K extends DataTypeKey,
+> = ValidateJsonValue<ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
+  ? Data
+  : ProtocolMap[K]>
 
 export type GetReturnType<
-  K extends DataTypeKey | string,
-  Fallback extends JsonValue
-> = K extends DataTypeKey
-  ? ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
-    ? Return
-    : void
-  : Fallback
+  K extends DataTypeKey,
+> = ValidateJsonValue<ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
+  ? Return
+  : void>

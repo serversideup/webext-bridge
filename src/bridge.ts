@@ -14,7 +14,7 @@ const openStreams = new Map<string, Stream>()
 const onOpenStreamCallbacks = new Map<string, (stream: Stream) => void>()
 const streamyEmitter = createNanoEvents()
 
-onMessage<{ channel: string; streamId: string }, string>('__crx_bridge_stream_open__', (message) => {
+onMessage('__crx_bridge_stream_open__', (message) => {
   return new Promise((resolve) => {
     const { sender, data } = message
     const { channel } = data

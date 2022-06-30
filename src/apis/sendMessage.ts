@@ -16,11 +16,10 @@ import { parseEndpoint } from '../utils'
  * @param destination default 'background'
  */
 export async function sendMessage<
-  ReturnType extends JsonValue,
-  K extends DataTypeKey | string
+  K extends DataTypeKey,
 >(
   messageID: K,
-  data: GetDataType<K, JsonValue>,
+  data: GetDataType<K>,
   destination: Destination = 'background',
 ) {
   const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
@@ -35,7 +34,7 @@ export async function sendMessage<
       throw new TypeError(`${errFn} When sending messages from background page, use @tabId syntax to target specific tab`)
   }
 
-  return new Promise<GetReturnType<K, ReturnType>>((resolve, reject) => {
+  return new Promise<GetReturnType<K>>((resolve, reject) => {
     const payload: IInternalMessage = {
       messageID,
       data,

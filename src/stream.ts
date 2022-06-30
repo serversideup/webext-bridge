@@ -25,7 +25,7 @@ class Stream {
     this.isClosed = false
 
     if (!Stream.initDone) {
-      onMessage<{ streamId: string; action: 'transfer' | 'close'; streamTransfer: JsonValue }, string>('__crx_bridge_stream_transfer__', (msg) => {
+      onMessage('__crx_bridge_stream_transfer__', (msg) => {
         const { streamId, streamTransfer, action } = msg.data
         const stream = Stream.openStreams.get(streamId)
         if (stream && !stream.isClosed) {
