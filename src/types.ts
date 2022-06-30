@@ -62,21 +62,21 @@ export interface ProtocolMap {
   // bar: ProtocolWithReturn<string, number>
 }
 
-export type DataTypeKey = keyof ProtocolMap
+export type DataTypeKey = keyof ProtocolMap extends never ? string : keyof ProtocolMap
 
 export type GetDataType<
-  K extends DataTypeKey | string = string,
+  K extends DataTypeKey,
   Fallback extends JsonValue = undefined,
-> = K extends DataTypeKey
+> = K extends keyof ProtocolMap
   ? ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
     ? Data
     : ProtocolMap[K]
   : Fallback
 
 export type GetReturnType<
-  K extends DataTypeKey | string = string,
+  K extends DataTypeKey,
   Fallback extends JsonValue = undefined,
-> = K extends DataTypeKey
+> = K extends keyof ProtocolMap
   ? ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
     ? Return
     : void
