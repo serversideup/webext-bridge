@@ -113,7 +113,7 @@ function initIntercoms() {
         portId = `${portId}.${portFrame}`
 
       // literal tab id in case of content script, however tab id of inspected page in case of devtools context
-      const { context, tabId: linkedTabId } = parseEndpoint(portId)
+      const { context, tabId: linkedTabId, frameId: linkedFrameId } = parseEndpoint(portId)
 
       // in-case the port handshake is from something else
       if (!linkedTabId && context !== 'popup' && context !== 'options')
@@ -134,8 +134,9 @@ function initIntercoms() {
 
       incomingPort.onMessage.addListener((message: IInternalMessage) => {
         if (message?.origin?.context) {
-          // origin tab ID is resolved from the port identifier (also prevent "MITM attacks" of extensions)
+          // origin tab ID and frame ID are resolved from the port identifier (also prevent "MITM attacks" of extensions)
           message.origin.tabId = linkedTabId
+          message.origin.frameId = linkedFrameId
 
           routeMessage(message)
         }
