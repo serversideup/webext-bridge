@@ -51,7 +51,7 @@ browser.runtime.onConnect.addListener((incomingPort) => {
     portId = `${portId}.${portFrame}`
 
   // literal tab id in case of content script, however tab id of inspected page in case of devtools context
-  const { context, tabId: linkedTabId } = parseEndpoint(portId)
+  const { context, tabId: linkedTabId, frameId: linkedFrameId } = parseEndpoint(portId)
 
   // in-case the port handshake is from something else
   if (!linkedTabId && context !== 'popup' && context !== 'options')
@@ -77,6 +77,7 @@ browser.runtime.onConnect.addListener((incomingPort) => {
     if (message?.origin?.context) {
       // origin tab ID is resolved from the port identifier (also prevent "MITM attacks" of extensions)
       message.origin.tabId = linkedTabId
+      message.origin.frameId = linkedFrameId
 
       endpointRuntime.handleMessage(message)
     }
