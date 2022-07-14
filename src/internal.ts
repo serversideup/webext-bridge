@@ -109,7 +109,7 @@ function initIntercoms() {
 
       const portFrame = incomingPort.sender.frameId
 
-      if (portFrame)
+      if (portFrame !== undefined)
         portId = `${portId}.${portFrame}`
 
       // literal tab id in case of content script, however tab id of inspected page in case of devtools context
@@ -202,7 +202,7 @@ export function routeMessage(message: IInternalMessage): void | Promise<void> {
         : (`${(destName === 'window' ? 'content-script' : destName)}@${(destTabId || srcTabId)}`)
 
       // Here it is checked if a specific frame needs to receive the message
-      if (destFrameId)
+      if (destFrameId !== undefined)
         resolvedDestination = `${resolvedDestination}.${destFrameId}`
 
       const destPort = portMap.get(resolvedDestination)
