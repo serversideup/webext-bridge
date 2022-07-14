@@ -109,7 +109,7 @@ function initIntercoms() {
 
       const portFrame = incomingPort.sender.frameId
 
-      if (portFrame)
+      if (portFrame !== undefined)
         portId = `${portId}.${portFrame}`
 
       // literal tab id in case of content script, however tab id of inspected page in case of devtools context
