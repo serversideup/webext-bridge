@@ -41,7 +41,7 @@ export interface HybridUnsubscriber {
   close: () => void
 }
 
-export type Destination = Endpoint | RuntimeContext | string
+export type Destination = Endpoint | RuntimeContext | (string & {})
 
 declare const ProtocolWithReturnSymbol: unique symbol
 
