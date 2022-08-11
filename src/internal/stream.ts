@@ -4,7 +4,7 @@ import type { Emitter } from 'nanoevents'
 import type { JsonValue } from 'type-fest'
 import type { Endpoint, HybridUnsubscriber, RuntimeContext, StreamInfo } from '../types'
 import type { EndpointRuntime } from './endpoint-runtime'
-import { parseEndpoint } from './parse-endpoint'
+import { parseEndpoint } from './endpoint'
 
 /**
  * Built on top of Bridge. Nothing much special except that Stream allows

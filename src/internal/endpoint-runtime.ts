@@ -2,7 +2,7 @@ import type { JsonValue } from 'type-fest'
 import uuid from 'tiny-uid'
 import { serializeError } from 'serialize-error'
 import type { DataTypeKey, Destination, GetDataType, GetReturnType, IBridgeMessage, IInternalMessage, OnMessageCallback, RuntimeContext } from '../types'
-import { parseEndpoint } from './parse-endpoint'
+import { parseEndpoint } from './endpoint'
 
 export interface EndpointRuntime {
   sendMessage: <ReturnType extends JsonValue, K extends DataTypeKey = DataTypeKey>(
