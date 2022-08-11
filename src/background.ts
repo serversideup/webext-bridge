@@ -2,7 +2,7 @@ import browser from 'webextension-polyfill'
 import type { Runtime } from 'webextension-polyfill'
 import type { IInternalMessage } from './types'
 import { createEndpointRuntime } from './internal/endpoint-runtime'
-import { parseEndpoint } from './internal/parse-endpoint'
+import { formatEndpoint, parseEndpoint } from './internal/endpoint'
 import { createStreamWirings } from './internal/stream'
 
 interface IQueuedMessage {
@@ -42,13 +42,12 @@ const endpointRuntime = createEndpointRuntime(
 )
 
 browser.runtime.onConnect.addListener((incomingPort) => {
-  // when coming from devtools, it should pre-fabricated with inspected tab as linked tab id
-  let portId = incomingPort.name || `content-script@${incomingPort.sender.tab.id}`
-
-  const portFrame = incomingPort.sender.frameId
-
-  if (portFrame)
-    portId = `${portId}.${portFrame}`
+  // all other contexts except 'content-script' are aware of, and pass their identity as name
+  const portId = incomingPort.name || formatEndpoint({
+    context: 'content-script',
+    tabId: incomingPort.sender.tab.id,
+    frameId: incomingPort.sender.frameId,
+  })
 
   // literal tab id in case of content script, however tab id of inspected page in case of devtools context
   const { context, tabId: linkedTabId, frameId: linkedFrameId } = parseEndpoint(portId)
