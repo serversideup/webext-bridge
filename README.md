@@ -159,11 +159,13 @@ Read `Behavior` section to see how destinations (or endpoints) are treated.
 
 ---
 
-### `onMessage(messageId: string, callback: fn)`
+### `onMessage(messageId: string, callback: fn): () => void`
 
 Register one and only one listener, per messageId per context. That will be called upon `sendMessage` from other side.
 
 Optionally, send a response to sender by returning any value or if async a `Promise`.
+
+This returns a function that will cancel the event it listens to.
 
 ##### `messageId`
 
