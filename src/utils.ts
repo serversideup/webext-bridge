@@ -34,19 +34,10 @@ export const getBackgroundPageType = () => {
     if (url.pathname === window.location.pathname) return 'options'
   }
 
-  const webAccessibleResources = manifest.web_accessible_resources
-  // manifest v2
-  if (typeof webAccessibleResources?.[0] === 'string') {
-    const urls = webAccessibleResources.map(resource => new URL(browser.runtime.getURL(resource)))
-    if (urls.find(url => url.pathname === window.location.pathname)) return 'web_accessible'
-  }
-  else {
-    // manifest v3
-    const urlPatterns: string[] = webAccessibleResources.map(entry => entry.resources).flat(1)
-    const patternsToRegex = urlPatterns.map(pattern => pattern.replace(/\*/g, '[^ ]*'))
-
-    // try to match the current url with a pattern from "web_accessible_resources"
-    if (patternsToRegex.find(pattern => window.location.pathname.replace(/^\//, '').match(new RegExp(`^${pattern}`)))) return 'web_accessible'
+  const url = new URL(window.location.href)
+  if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') {
+    const extensionId = browser.runtime.id
+    if (extensionId === url.host) return 'web_accessible'
   }
 
   return 'background'
