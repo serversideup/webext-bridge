@@ -1,6 +1,6 @@
 import { Jsonify, JsonValue } from 'type-fest'
 
-export type RuntimeContext = 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window'
+export type RuntimeContext = 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window' | 'web_accessible'
 
 export type Endpoint = {
   context: RuntimeContext
