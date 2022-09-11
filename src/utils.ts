@@ -1,7 +1,7 @@
 import browser, { Manifest } from 'webextension-polyfill'
 import { Endpoint, RuntimeContext } from './types'
 
-const ENDPOINT_RE = /^((?:background$)|devtools|popup|options|content-script|window)(?:@(\d+)(?:\.(\d+))?)?$/
+const ENDPOINT_RE = /^((?:background$)|devtools|popup|options|content-script|window|web_accessible)(?:@(\d+)(?:\.(\d+))?)?$/
 
 export const parseEndpoint = (endpoint: string): Endpoint => {
   const [, context, tabId, frameId] = endpoint.match(ENDPOINT_RE) || []
@@ -13,7 +13,7 @@ export const parseEndpoint = (endpoint: string): Endpoint => {
   }
 }
 
-export const isInternalEndpoint = ({ context: ctx }: Endpoint): boolean => ['content-script', 'background', 'devtools'].includes(ctx)
+export const isInternalEndpoint = ({ context: ctx }: Endpoint): boolean => ['content-script', 'background', 'devtools', 'web_accessible'].includes(ctx)
 
 // Return true if the `browser` object has a specific namespace
 export const hasAPI = (nsps: string): boolean => browser[nsps]

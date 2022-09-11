@@ -39,7 +39,7 @@ export function allowWindowMessaging(nsps: string): void {
   namespace = nsps
 }
 
-function initIntercoms() {
+async function initIntercoms() {
   if (context === null)
     throw new Error('Unable to detect runtime context i.e webext-bridge can\'t figure out what to do')
 
@@ -88,6 +88,26 @@ function initIntercoms() {
 
   if (context === 'popup' || context === 'options') {
     const name = `${context}`
+
+    port = browser.runtime.connect(undefined, { name })
+
+    port.onMessage.addListener((message: IInternalMessage) => {
+      routeMessage(message)
+    })
+
+    port.onDisconnect.addListener(() => {
+      port = null
+      initIntercoms()
+    })
+  }
+
+  if (context === 'web_accessible') {
+    const tabs = await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    })
+    const { id } = tabs[0]
+    const name = `web_accessible@${id}`
 
     port = browser.runtime.connect(undefined, { name })
 
