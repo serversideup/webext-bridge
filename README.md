@@ -147,9 +147,9 @@ Any serializable value you want to pass to other side, latter can access this va
 > Required | `string | ` 
 
 The actual identifier of other endpoint.
-Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453`
+Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453` or `web_accessible@3412`
 
-`content-script`, `window` and `devtools` destinations can be suffixed with `@<tabId>` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
+`content-script`, `window`, `devtools` and `web_accessible` destinations can be suffixed with `@<tabId>` to target specific tab. Example: `devtools@351`, points to devtools panel inspecting tab with id 351.
 
 For `content-script`, a specific `frameId` can be specified by appending the `frameId` to the suffix `@<tabId>.<frameId>`.
 
