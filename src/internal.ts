@@ -136,7 +136,7 @@ async function initIntercoms() {
       const { context, tabId: linkedTabId, frameId: linkedFrameId } = parseEndpoint(portId)
 
       // in-case the port handshake is from something else
-      if (!linkedTabId && context !== 'popup' && context !== 'options')
+      if (!linkedTabId && context !== 'popup' && context !== 'options' && context !== 'web_accessible')
         return
 
       portMap.set(portId, incomingPort)
@@ -192,7 +192,7 @@ export function routeMessage(message: IInternalMessage): void | Promise<void> {
       return routeMessageThroughWindow(window, message)
     }
 
-    else if (['devtools', 'content-script', 'popup', 'options'].includes(context)) {
+    else if (['devtools', 'content-script', 'popup', 'options', 'web_accessible'].includes(context)) {
       if (destination.context === 'background')
         message.destination = null
 
