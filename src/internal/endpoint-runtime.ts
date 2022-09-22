@@ -1,14 +1,26 @@
 import type { JsonValue } from 'type-fest'
 import uuid from 'tiny-uid'
 import { serializeError } from 'serialize-error'
-import type { DataTypeKey, Destination, GetDataType, GetReturnType, IBridgeMessage, IInternalMessage, OnMessageCallback, RuntimeContext } from '../types'
+import type {
+  BridgeMessage,
+  DataTypeKey,
+  Destination,
+  GetDataType,
+  GetReturnType,
+  InternalMessage,
+  OnMessageCallback,
+  RuntimeContext,
+} from '../types'
 import { parseEndpoint } from './endpoint'
 
 export interface EndpointRuntime {
-  sendMessage: <ReturnType extends JsonValue, K extends DataTypeKey = DataTypeKey>(
+  sendMessage: <
+    ReturnType extends JsonValue,
+    K extends DataTypeKey = DataTypeKey,
+  >(
     messageID: K,
     data: GetDataType<K, JsonValue>,
-    destination?: Destination,
+    destination?: Destination
   ) => Promise<GetReturnType<K, ReturnType>>
   onMessage: <Data extends JsonValue, K extends DataTypeKey = DataTypeKey>(
     messageID: K,
@@ -17,16 +29,30 @@ export interface EndpointRuntime {
   /**
    * @internal
    */
-  handleMessage: (message: IInternalMessage) => void
+  handleMessage: (message: InternalMessage) => void
+  endTransaction: (transactionID: string) => void
 }
 
-export const createEndpointRuntime = (thisContext: RuntimeContext, routeMessage: (msg: IInternalMessage) => void): EndpointRuntime => {
+export const createEndpointRuntime = (
+  thisContext: RuntimeContext,
+  routeMessage: (msg: InternalMessage) => void,
+  localMessage?: (msg: InternalMessage) => void,
+): EndpointRuntime => {
   const runtimeId = uuid()
-  const openTransactions = new Map<string, { resolve: (v: unknown) => void; reject: (e: unknown) => void }>()
+  const openTransactions = new Map<
+  string,
+  { resolve: (v: unknown) => void; reject: (e: unknown) => void }
+  >()
   const onMessageListeners = new Map<string, OnMessageCallback<JsonValue>>()
 
-  const handleMessage = (message: IInternalMessage) => {
-    if (message.destination.context === thisContext && !message.destination.frameId && !message.destination.tabId) {
+  const handleMessage = (message: InternalMessage) => {
+    if (
+      message.destination.context === thisContext
+      && !message.destination.frameId
+      && !message.destination.tabId
+    ) {
+      localMessage?.(message)
+
       const { transactionId, messageID, messageType } = message
 
       const handleReply = () => {
@@ -36,7 +62,9 @@ export const createEndpointRuntime = (thisContext: RuntimeContext, routeMessage:
           if (err) {
             const dehydratedErr = err as Record<string, string>
             const errCtr = self[dehydratedErr.name] as any
-            const hydratedErr = new (typeof errCtr === 'function' ? errCtr : Error)(dehydratedErr.message)
+            const hydratedErr = new (
+              typeof errCtr === 'function' ? errCtr : Error
+            )(dehydratedErr.message)
 
             // eslint-disable-next-line no-restricted-syntax
             for (const prop in dehydratedErr)
@@ -65,11 +93,13 @@ export const createEndpointRuntime = (thisContext: RuntimeContext, routeMessage:
               id: messageID,
               data: message.data,
               timestamp: message.timestamp,
-            } as IBridgeMessage<JsonValue>)
+            } as BridgeMessage<JsonValue>)
           }
           else {
             noHandlerFoundError = true
-            throw new Error(`[webext-bridge] No handler registered in '${thisContext}' to accept messages with id '${messageID}'`)
+            throw new Error(
+              `[webext-bridge] No handler registered in '${thisContext}' to accept messages with id '${messageID}'`,
+            )
           }
         }
         catch (error) {
@@ -94,8 +124,10 @@ export const createEndpointRuntime = (thisContext: RuntimeContext, routeMessage:
       }
 
       switch (messageType) {
-        case 'reply': return handleReply()
-        case 'message': return handleNewMessage()
+        case 'reply':
+          return handleReply()
+        case 'message':
+          return handleNewMessage()
       }
     }
 
@@ -106,15 +138,26 @@ export const createEndpointRuntime = (thisContext: RuntimeContext, routeMessage:
 
   return {
     handleMessage,
+    endTransaction: (transactionID) => {
+      const transactionP = openTransactions.get(transactionID)
+      transactionP?.reject('Transaction was ended before it could complete')
+      openTransactions.delete(transactionID)
+    },
     sendMessage: (messageID, data, destination = 'background') => {
-      const endpoint = typeof destination === 'string' ? parseEndpoint(destination) : destination
+      const endpoint
+        = typeof destination === 'string'
+          ? parseEndpoint(destination)
+          : destination
       const errFn = 'Bridge#sendMessage ->'
 
-      if (!endpoint.context)
-        throw new TypeError(`${errFn} Destination must be any one of known destinations`)
+      if (!endpoint.context) {
+        throw new TypeError(
+          `${errFn} Destination must be any one of known destinations`,
+        )
+      }
 
       return new Promise((resolve, reject) => {
-        const payload: IInternalMessage = {
+        const payload: InternalMessage = {
           messageID,
           data,
           destination: endpoint,

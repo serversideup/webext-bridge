@@ -1,6 +1,12 @@
 import type { JsonValue, Jsonify } from 'type-fest'
 
-export type RuntimeContext = 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window'
+export type RuntimeContext =
+  | 'devtools'
+  | 'background'
+  | 'popup'
+  | 'options'
+  | 'content-script'
+  | 'window'
 
 export interface Endpoint {
   context: RuntimeContext
@@ -8,16 +14,18 @@ export interface Endpoint {
   frameId?: number
 }
 
-export interface IBridgeMessage<T extends JsonValue> {
+export interface BridgeMessage<T extends JsonValue> {
   sender: Endpoint
   id: string
   data: T
   timestamp: number
 }
 
-export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (message: IBridgeMessage<T>) => R | Promise<R>
+export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (
+  message: BridgeMessage<T>
+) => R | Promise<R>
 
-export interface IInternalMessage {
+export interface InternalMessage {
   origin: Endpoint
   destination: Endpoint
   transactionId: string
@@ -62,7 +70,9 @@ export interface ProtocolMap {
   // bar: ProtocolWithReturn<string, number>
 }
 
-export type DataTypeKey = keyof ProtocolMap extends never ? string : keyof ProtocolMap
+export type DataTypeKey = keyof ProtocolMap extends never
+  ? string
+  : keyof ProtocolMap
 
 export type GetDataType<
   K extends DataTypeKey,
