@@ -25,7 +25,7 @@ export interface EndpointRuntime {
   onMessage: <Data extends JsonValue, K extends DataTypeKey = DataTypeKey>(
     messageID: K,
     callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>
-  ) => void
+  ) => (() => void)
   /**
    * @internal
    */
@@ -181,6 +181,7 @@ export const createEndpointRuntime = (
     },
     onMessage: (messageID, callback) => {
       onMessageListeners.set(messageID, callback)
+      return () => onMessageListeners.delete(messageID)
     },
   }
 }
