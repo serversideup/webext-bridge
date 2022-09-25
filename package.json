@@ -1,6 +1,6 @@
 {
-  "name": "webext-bridge",
-  "version": "5.0.5",
+  "name": "@arconnect/webext-bridge",
+  "version": "5.0.6",
   "description": "Messaging in Web Extensions made easy. Out of the box.",
   "keywords": [
     "chrome",
@@ -18,9 +18,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/webext-bridge.git"
+    "url": "git+https://github.com/arconnectio/webext-bridge.git"
   },
-  "author": "Neek Sandhu <neek.sandhu@outlook.com>",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -32,10 +31,6 @@
   "files": [
     "dist"
   ],
-  "bugs": {
-    "url": "https://github.com/antfu/webext-bridge/issues"
-  },
-  "homepage": "https://github.com/antfu/webext-bridge#readme",
   "dependencies": {
     "@types/webextension-polyfill": "^0.8.3",
     "nanoevents": "^6.0.2",
