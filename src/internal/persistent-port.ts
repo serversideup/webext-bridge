@@ -107,6 +107,10 @@ export const createPersistentPort = (name = '') => {
     })
   }
 
+  window.onpageshow = (event) => {
+    if (event.persisted) connect()
+  }
+
   connect()
 
   return {
