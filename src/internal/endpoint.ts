@@ -13,7 +13,7 @@ export const parseEndpoint = (endpoint: string): Endpoint => {
 }
 
 export const formatEndpoint = ({ context, tabId, frameId }: Endpoint): string => {
-  if (['popup', 'options'].includes(context))
+  if (['background', 'popup', 'options'].includes(context))
     return context
 
   return `${context}@${tabId}${frameId ? `.${frameId}` : ''}`
