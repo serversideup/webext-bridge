@@ -135,7 +135,7 @@ const endpointRuntime = createEndpointRuntime(
   (message) => {
     if (
       message.origin.context === 'background'
-      && message.destination.context !== 'background'
+      && ['content-script', 'devtools '].includes(message.destination.context)
       && !message.destination.tabId
     ) {
       throw new TypeError(
@@ -244,6 +244,8 @@ browser.runtime.onConnect.addListener((incomingPort) => {
   const { tabId: linkedTabId, frameId: linkedFrameId } = parseEndpoint(
     connArgs.endpointName,
   )
+
+  console.log('port connected', connArgs)
 
   connMap.set(connArgs.endpointName, {
     fingerprint: connArgs.fingerprint,
