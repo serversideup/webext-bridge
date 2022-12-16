@@ -87,9 +87,12 @@ export const createEndpointRuntime = (
         try {
           const cb = onMessageListeners.get(messageID)
           if (typeof cb === 'function') {
+            // message.origin must be cloned
+            // so mutations to the original object don't affect the clone
+
             // eslint-disable-next-line n/no-callback-literal
             reply = await cb({
-              sender: message.origin,
+              sender: Object.assign({}, message.origin),
               id: messageID,
               data: message.data,
               timestamp: message.timestamp,
@@ -113,7 +116,7 @@ export const createEndpointRuntime = (
             messageType: 'reply',
             data: reply,
             origin: { context: thisContext, tabId: null },
-            destination: message.origin,
+            destination: Object.assign({}, message.origin),
             hops: [],
           })
 

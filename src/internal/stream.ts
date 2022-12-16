@@ -62,7 +62,7 @@ export class Stream {
       streamId: this.streamInfo.streamId,
       streamTransfer: msg,
       action: 'transfer',
-    }, this.streamInfo.endpoint)
+    }, Object.assign({}, this.streamInfo.endpoint))
   }
 
   /**
@@ -81,7 +81,7 @@ export class Stream {
       streamId: this.streamInfo.streamId,
       streamTransfer: null,
       action: 'close',
-    }, this.streamInfo.endpoint)
+    }, Object.assign({}, this.streamInfo.endpoint))
   }
 
   /**
