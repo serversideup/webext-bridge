@@ -76,7 +76,7 @@ const notifyEndpoint = (endpoint: string) => ({
         message: InternalMessage,
       ) => {
         const sender = connMap.get(endpoint)
-        if (sender?.fingerprint === fingerprint) {
+        if (fingerprint && sender?.fingerprint === fingerprint) {
           PortMessage.toExtensionContext(sender.port, {
             status: 'undeliverable',
             resolvedDestination,
