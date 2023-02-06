@@ -164,6 +164,9 @@ const endpointRuntime = createEndpointRuntime(
     const sender = connMap.get(resolvedSender)
 
     const deliver = () => {
+      const dest = connMap.get(resolvedDestination)
+      const sender = connMap.get(resolvedSender)
+
       notifyEndpoint(resolvedDestination)
         .withFingerprint(dest.fingerprint)
         .aboutIncomingMessage(message)
