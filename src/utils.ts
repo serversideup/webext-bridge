@@ -34,5 +34,10 @@ export const getBackgroundPageType = () => {
     if (url.pathname === window.location.pathname) return 'options'
   }
 
+  if (manifest.chrome_url_overrides?.newtab) {
+    const url = new URL(browser.runtime.getURL(manifest.chrome_url_overrides.newtab))
+    if (url.pathname === window.location.pathname) return 'options'
+  }
+
   return 'background'
 }

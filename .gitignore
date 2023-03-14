@@ -58,4 +58,4 @@ typings/
 .env
 
 # transpiled output
-dist
+# dist
