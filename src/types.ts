@@ -89,7 +89,7 @@ export type GetDataType<
 
 
 export type GetReturnType<
-  K extends DataTypeKey, 
+  K extends DataTypeKey,
   Fallback extends JsonValue = undefined
 > = K extends keyof ProtocolMap
   ? ProtocolMap[K] extends (...args: any[]) => infer R
