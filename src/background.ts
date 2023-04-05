@@ -245,8 +245,6 @@ browser.runtime.onConnect.addListener((incomingPort) => {
     connArgs.endpointName,
   )
 
-  console.log('port connected', connArgs)
-
   connMap.set(connArgs.endpointName, {
     fingerprint: connArgs.fingerprint,
     port: incomingPort,
