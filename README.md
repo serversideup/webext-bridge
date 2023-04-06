@@ -1,61 +1,60 @@
 # webext-bridge
 
-Messaging in WebExtension made super easy. Out of the box.
+Messaging in WebExtensions made super easy. Out of the box.
 
 [![](https://img.shields.io/npm/v/webext-bridge?color=2B90B6&label=)](https://www.npmjs.com/package/webext-bridge)
 
-> Forked from [crx-bridge](https://github.com/NeekSandhu/crx-bridge) by [NeekSandhu](https://github.com/NeekSandhu)
-
-##### Changes in this Fork
-
-- build esm instead of cjs (for better bundler optimization)
-- use `nanoevents` instead of `events` (decoupled form node module)
-- [type safe protocols](#type-safe-protocols)
-- See more in `CHANGELOG.md`
-
-----
-
-## How much easy exactly?
-
-This much
+## Example
 
 <a name="example"></a>
 
 ```javascript
 // Inside devtools script
-import { sendMessage } from 'webext-bridge/devtools'
 
-// ...
+import { sendMessage } from "webext-bridge/devtools";
 
-button.addEventListener('click', async () => {
-  const res = await sendMessage('get-selection',  { ignoreCasing: true },  'content-script')  
-  console.log(res)   // > "The brown fox is alive and well"
-})
+button.addEventListener("click", async () => {
+  const res = await sendMessage(
+    "get-selection",
+    { ignoreCasing: true },
+    "content-script"
+  );
+  console.log(res); // > "The brown fox is alive and well"
+});
 ```
 
 ```javascript
 // Inside content script
-import { sendMessage, onMessage } from 'webext-bridge/content-script'
 
-onMessage('get-selection', async (message) => {
-  const { sender, data: { ignoreCasing } } = message  
+import { sendMessage, onMessage } from "webext-bridge/content-script";
 
-  console.log(sender.context, sender.tabId)   // > content-script  156
+onMessage("get-selection", async (message) => {
+  const {
+    sender,
+    data: { ignoreCasing },
+  } = message;
 
-  const { selection } = await sendMessage('get-preferences', { sync: false }, 'background')  
-  return calculateSelection(data.ignoreCasing, selection)  
-})  
+  console.log(sender.context, sender.tabId); // > devtools  156
+
+  const { selection } = await sendMessage(
+    "get-preferences",
+    { sync: false },
+    "background"
+  );
+  return calculateSelection(data.ignoreCasing, selection);
+});
 ```
 
 ```javascript
 // Inside background script
-import { onMessage } from 'webext-bridge/background'
 
-onMessage('get-preferences', ({ data }) => {
-  const { sync } = data  
+import { onMessage } from "webext-bridge/background";
 
-  return loadUserPreferences(sync)  
-})  
+onMessage("get-preferences", ({ data }) => {
+  const { sync } = data;
+
+  return loadUserPreferences(sync);
+});
 ```
 
 > Examples above require transpilation and/or bundling using `webpack`/`babel`/`rollup`
@@ -83,20 +82,21 @@ Just `import { } from 'webext-bridge/{context}'` wherever you need it and use as
 
 ## Type Safe Protocols
 
-As we are likely to use `sendMessage` and `onMessage` in different context, keep the type consistent could be hard and easy to make mistakes. `webext-bridge` provide a smarter way to make the type for protocols much easier.
+As we are likely to use `sendMessage` and `onMessage` in different contexts, keeping the type consistent could be hard, and its easy to make mistakes. `webext-bridge` provide a smarter way to make the type for protocols much easier.
 
 Create `shim.d.ts` file with the following content and make sure it's been included in `tsconfig.json`.
 
 ```ts
 // shim.d.ts
-import { ProtocolWithReturn } from 'webext-bridge'
 
-declare module 'webext-bridge' {
+import { ProtocolWithReturn } from "webext-bridge";
+
+declare module "webext-bridge" {
   export interface ProtocolMap {
-    foo: { title: string }
+    foo: { title: string };
     // to specify the return type of the message,
     // use the `ProtocolWithReturn` type wrapper
-    bar: ProtocolWithReturn<CustomDataType, CustomReturnType>
+    bar: ProtocolWithReturn<CustomDataType, CustomReturnType>;
   }
 }
 ```
@@ -111,9 +111,11 @@ onMessage('foo', ({ data }) => {
 ```
 
 ```ts
-import { sendMessage } from 'webext-bridge/background'
+import { sendMessage } from "webext-bridge/background";
 
-const returnData = await sendMessage('bar', { /* ... */ })
+const returnData = await sendMessage("bar", {
+  /* ... */
+});
 // type of `returnData` will be `CustomReturnType` as specified
 ```
 
@@ -121,7 +123,7 @@ const returnData = await sendMessage('bar', { /* ... */ })
 
 ### `sendMessage(messageId: string, data: any, destination: string)`
 
-Sends a message to some other part of your extension, out of the box.
+Sends a message to some other part of your extension.
 
 Notes:
 
@@ -130,6 +132,8 @@ Notes:
 - Listener on the other may want to reply. Get the reply by `await`ing the returned `Promise`
 
 - An error thrown in listener callback (in the destination context) will behave as usual, that is, bubble up, but the same error will also be thrown where `sendMessage` was called
+
+- If the listener receives the message but the destination disconnects (tab closure for exmaple) before responding, `sendMessage` will throw an error in the sender context.
 
 ##### `messageId`
 
@@ -145,7 +149,7 @@ Any serializable value you want to pass to other side, latter can access this va
 
 ##### `destination`
 
-> Required | `string | ` 
+> Required | `string | `
 
 The actual identifier of other endpoint.
 Example: `devtools` or `content-script` or `background` or `content-script@133` or `devtools@453`
@@ -276,7 +280,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 > Following rules apply to `destination` being specified in `sendMessage(msgId, data, destination)` and `openStream(channelId, initialData, destination)`
 
 - Specifying `devtools` as destination from `content-script` will auto-route payload to inspecting `devtools` page if open and listening. If devtools are not open, message will be queued up and
-delivered when devtools are opened and the user switches to your extension's devtools panel.
+  delivered when devtools are opened and the user switches to your extension's devtools panel.
 
 - Specifying `content-script` as destination from `devtools` will auto-route the message to inspected window's top `content-script` page if listening. If page is loading, message will be queued up and delivered when page is ready and listening.
 
@@ -288,7 +292,7 @@ delivered when devtools are opened and the user switches to your extension's dev
 
 ## Serious security note
 
-The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background` or `devtools` scope, which is default setting.
+The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background`, `popup`, `options`, or `devtools` scope, which is the default setting.
 
 `window` context(s) in tab `A` get unlocked the moment you call `allowWindowMessaging(namespace)` somewhere in your extension's content script(s) that's also loaded in tab `A`.
 
@@ -302,16 +306,17 @@ As an example if you plan on having something critical, **always** verify the `s
 
 ```javascript
 // background.js
-import { onMessage, isInternalEndpoint } from 'webext-bridge'  
 
-onMessage('getUserBrowsingHistory', (message) => {
-  const { data, sender } = message  
-  // Respond only if request is from 'devtools', 'content-script' or 'background' endpoint
+import { onMessage, isInternalEndpoint } from "webext-bridge/background";
+
+onMessage("getUserBrowsingHistory", (message) => {
+  const { data, sender } = message;
+  // Respond only if request is from 'devtools', 'content-script', 'popup', 'options', or 'background' endpoint
   if (isInternalEndpoint(sender)) {
-    const { range } = data  
-    return getHistory(range)  
+    const { range } = data;
+    return getHistory(range);
   }
-})  
+});
 ```
 
 <a name="troubleshooting"></a>
@@ -319,12 +324,12 @@ onMessage('getUserBrowsingHistory', (message) => {
 ## Troubleshooting
 
 - Doesn't work?
-  <br>If `window` contexts are not part of the puzzle, `webext-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `webext-bridge` hasn't been loaded in background page of your extension, which is used by `webext-bridge` as a staging area. If you don't need a background page for yourself, here's bare minimum to get `webext-bridge` going.
+  <br>If `window` contexts are not part of the puzzle, `webext-bridge` works out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `webext-bridge` hasn't been loaded in background page of your extension, which is used by `webext-bridge` as a relay. If you don't need a background page for yourself, here's bare minimum to get `webext-bridge` going.
 
 ```javascript
 // background.js (requires transpiration/bundling using webpack(recommended))
 
-import 'webext-bridge/background'
+import "webext-bridge/background";
 ```
 
 ```javascript

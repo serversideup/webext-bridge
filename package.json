@@ -18,7 +18,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/webext-bridge.git"
+    "url": "git+https://github.com/zikaari/webext-bridge.git"
   },
   "author": "Neek Sandhu <neek.sandhu@outlook.com>",
   "scripts": {
@@ -88,9 +88,9 @@
     "dist/**/*"
   ],
   "bugs": {
-    "url": "https://github.com/antfu/webext-bridge/issues"
+    "url": "https://github.com/zikaari/webext-bridge/issues"
   },
-  "homepage": "https://github.com/antfu/webext-bridge#readme",
+  "homepage": "https://github.com/zikaari/webext-bridge#readme",
   "dependencies": {
     "@types/webextension-polyfill": "^0.8.3",
     "nanoevents": "^6.0.2",
