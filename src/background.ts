@@ -160,20 +160,20 @@ const endpointRuntime = createEndpointRuntime(
     message.destination.tabId = null
     message.destination.frameId = null
 
-    const dest = connMap.get(resolvedDestination)
-    const sender = connMap.get(resolvedSender)
+    const dest = () => connMap.get(resolvedDestination)
+    const sender = () => connMap.get(resolvedSender)
 
     const deliver = () => {
       notifyEndpoint(resolvedDestination)
-        .withFingerprint(dest.fingerprint)
+        .withFingerprint(dest().fingerprint)
         .aboutIncomingMessage(message)
 
       const receipt: DeliveryReceipt = {
         message,
-        to: dest.fingerprint,
+        to: dest().fingerprint,
         from: {
           endpointId: resolvedSender,
-          fingerprint: sender?.fingerprint,
+          fingerprint: sender()?.fingerprint,
         },
       }
 
@@ -182,23 +182,23 @@ const endpointRuntime = createEndpointRuntime(
       if (message.messageType === 'reply')
         pendingResponses.remove(message.messageID)
 
-      if (sender) {
+      if (sender()) {
         notifyEndpoint(resolvedSender)
-          .withFingerprint(sender.fingerprint)
+          .withFingerprint(sender().fingerprint)
           .aboutSuccessfulDelivery(receipt)
       }
     }
 
-    if (dest?.port) {
+    if (dest()?.port) {
       deliver()
     }
     else if (message.messageType === 'message') {
       if (message.origin.context === 'background') {
         oncePortConnected(resolvedDestination, deliver)
       }
-      else if (sender) {
+      else if (sender()) {
         notifyEndpoint(resolvedSender)
-          .withFingerprint(sender.fingerprint)
+          .withFingerprint(sender().fingerprint)
           .aboutMessageUndeliverability(resolvedDestination, message)
           .and()
           .whenDeliverableTo(resolvedDestination)
