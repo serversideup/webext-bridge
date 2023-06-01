@@ -1,5 +1,7 @@
 # webext-bridge
 
+[中文](./README-zh.md)
+
 Messaging in WebExtensions made super easy. Out of the box.
 
 [![](https://img.shields.io/npm/v/webext-bridge?color=2B90B6&label=)](https://www.npmjs.com/package/webext-bridge)
