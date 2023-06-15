@@ -94,7 +94,7 @@
   "dependencies": {
     "@types/webextension-polyfill": "^0.8.3",
     "nanoevents": "^6.0.2",
-    "serialize-error": "^9.0.0",
+    "serialize-error": "^11.0.0",
     "tiny-uid": "^1.1.1",
     "webextension-polyfill": "^0.9.0"
   },
