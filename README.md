@@ -1,3 +1,6 @@
+## ⚠ Project unmaintained - looking for maintainers ⚠
+See [this issue](https://github.com/zikaari/webext-bridge/issues/72) for details
+
 # webext-bridge
 
 [中文](./README-zh.md)
