@@ -12,7 +12,7 @@
 </p>
 
 > [!IMPORTANT]  
-> **`webext-bridge` just joined the Server Side Up family of open source projects.** [Read the announcement →](https://github.com/serversideup/webext-bridge/discussions/74)
+> **`webext-bridge` just joined the Server Side Up family of open source projects. [Read the announcement →](https://github.com/serversideup/webext-bridge/discussions/74)****
 
 # Introduction
 **Messaging in web extensions made easy. Batteries included.** Reduce headache and simplify the effort of keeping data in sync across different parts of your extension. `webext-bridge` is a tiny library that provides a simple and consistent API for sending and receiving messages between different parts of your web extension, such as `background`, `content-script`, `devtools`, `popup`, `options`, and `window` contexts.
