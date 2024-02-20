@@ -74,6 +74,11 @@ onMessage("get-preferences", ({ data }) => {
 
 `webext-bridge` handles everything for you as efficiently as possible. No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `chrome.runtime.connect` ....
 
+## Learn how to use "webext-bridge" with our book
+We put together a comprehensive guide to help people build multi-platform browser extensions. The book covers everything from getting started to advanced topics like messaging, storage, and debugging. It's a great resource for anyone looking to build a browser extension. The book specifically covers how to use `webext-bridge` to simplify messaging in your extension.
+
+<a href="https://serversideup.net/building-multi-platform-browser-extensions/"><img src="https://serversideup.net/wp-content/uploads/2024/02/ExtensionBook-Twitter-2.png" title="Documentation" width="100%"></a>
+
 ## Setup
 
 ### Install
