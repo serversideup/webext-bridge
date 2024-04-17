@@ -329,7 +329,7 @@ import { onMessage, isInternalEndpoint } from "webext-bridge/background";
 
 onMessage("getUserBrowsingHistory", (message) => {
   const { data, sender } = message;
-  // Respond only if request is from 'devtools', 'content-script', 'popup', 'options', or 'background' endpoint
+  // Respond only if request is from 'devtools', 'content-script', 'popup', 'options', 'side-panel', or 'background' endpoint
   if (isInternalEndpoint(sender)) {
     const { range } = data;
     return getHistory(range);
