@@ -15,7 +15,7 @@
 > **`webext-bridge` just joined the Server Side Up family of open source projects.** [Read the announcement →](https://github.com/serversideup/webext-bridge/discussions/74)
 
 # Introduction
-**Messaging in web extensions made easy. Batteries included.** Reduce headache and simplify the effort of keeping data in sync across different parts of your extension. `webext-bridge` is a tiny library that provides a simple and consistent API for sending and receiving messages between different parts of your web extension, such as `background`, `content-script`, `devtools`, `popup`, `options`, and `window` contexts.
+**Messaging in web extensions made easy. Batteries included.** Reduce headache and simplify the effort of keeping data in sync across different parts of your extension. `webext-bridge` is a tiny library that provides a simple and consistent API for sending and receiving messages between different parts of your web extension, such as `background`, `content-script`, `devtools`, `popup`, `options`, `side-panel` and `window` contexts.
 
 ## Example
 
@@ -310,7 +310,7 @@ Callback that should be called whenever `Stream` is opened from the other side. 
 
 ## Serious security note
 
-The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background`, `popup`, `options`, or `devtools` scope, which is the default setting.
+The following note only applies if and only if, you will be sending/receiving messages to/from `window` contexts. There's no security concern if you will be only working with `content-script`, `background`, `popup`, `options`, `side-panel` or `devtools` scope, which is the default setting.
 
 `window` context(s) in tab `A` get unlocked the moment you call `allowWindowMessaging(namespace)` somewhere in your extension's content script(s) that's also loaded in tab `A`.
 
@@ -329,7 +329,7 @@ import { onMessage, isInternalEndpoint } from "webext-bridge/background";
 
 onMessage("getUserBrowsingHistory", (message) => {
   const { data, sender } = message;
-  // Respond only if request is from 'devtools', 'content-script', 'popup', 'options', or 'background' endpoint
+  // Respond only if request is from 'devtools', 'content-script', 'popup', 'options', 'side-panel', or 'background' endpoint
   if (isInternalEndpoint(sender)) {
     const { range } = data;
     return getHistory(range);

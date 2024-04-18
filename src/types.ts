@@ -7,6 +7,7 @@ export type RuntimeContext =
   | 'options'
   | 'content-script'
   | 'window'
+  | 'side-panel'
 
 export interface Endpoint {
   context: RuntimeContext
@@ -85,16 +86,15 @@ export type GetDataType<
     : ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
       ? Data
       : ProtocolMap[K]
-  : Fallback;
-
+  : Fallback
 
 export type GetReturnType<
   K extends DataTypeKey,
-  Fallback extends JsonValue = undefined
+  Fallback extends JsonValue = undefined,
 > = K extends keyof ProtocolMap
   ? ProtocolMap[K] extends (...args: any[]) => infer R
     ? R
     : ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
       ? Return
       : void
-  : Fallback;
+  : Fallback

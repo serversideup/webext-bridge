@@ -12,12 +12,14 @@ const endpointRuntime = createEndpointRuntime('content-script', (message) => {
 })
 
 win.onMessage((message: InternalMessage) => {
-  endpointRuntime.handleMessage(Object.assign({}, message, {origin: {
+  endpointRuntime.handleMessage(Object.assign({}, message, {
+    origin: {
     // a message event inside `content-script` means a script inside `window` dispatched it to be forwarded
     // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
-    context: "window",
-    tabId: null
-  }}))
+      context: 'window',
+      tabId: null,
+    },
+  }))
 })
 
 port.onMessage(endpointRuntime.handleMessage)
