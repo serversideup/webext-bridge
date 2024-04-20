@@ -62,7 +62,7 @@ export class Stream {
       streamId: this.streamInfo.streamId,
       streamTransfer: msg,
       action: 'transfer',
-    }, this.streamInfo.endpoint)
+    }, { ...this.streamInfo.endpoint })
   }
 
   /**
@@ -81,7 +81,7 @@ export class Stream {
       streamId: this.streamInfo.streamId,
       streamTransfer: null,
       action: 'close',
-    }, this.streamInfo.endpoint)
+    }, {... this.streamInfo.endpoint })
   }
 
   /**
@@ -124,8 +124,8 @@ export const createStreamWirings = (endpointRuntime: EndpointRuntime) => {
   const streamyEmitter = createNanoEvents()
 
   endpointRuntime.onMessage<{ channel: string; streamId: string }, string>('__crx_bridge_stream_open__', (message) => {
+    const { sender, data } = message
     return new Promise((resolve) => {
-      const { sender, data } = message
       const { channel } = data
       let watching = false
       let off = () => { }
@@ -134,7 +134,7 @@ export const createStreamWirings = (endpointRuntime: EndpointRuntime) => {
         const callback = onOpenStreamCallbacks.get(channel)
 
         if (typeof callback === 'function') {
-          callback(new Stream(endpointRuntime, { ...data, endpoint: sender }))
+          callback(new Stream(endpointRuntime, { ...data, endpoint: { ...sender } }))
           if (watching)
             off()
 
