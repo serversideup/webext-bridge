@@ -1,27 +1,35 @@
 <template>
-    <div class="mx-auto max-w-[940px] flex flex-col px-6 pt-36 lg:pt-48">
-        <h1 class="font-inter text-[32px] leading-[32px] text-white font-bold lg:text-center lg:text-[60px] lg:leading-[64px]">
-            Zero-downtime deployments, 100% replication, <span class="text-[#1CE783]">without breaking the bank</span>.
-        </h1>
+    <div class="w-full pt-24 mt-28">
+        <div class="flex flex-col items-center justify-center mx-auto w-full max-w-7xl">
+            <div class="flex items-center p-1 pr-[10px] rounded-full text-[#84ADFF] font-sans font-medium text-sm border border-[#0040C1] bg-[#026]">
+                <span class="py-[2px] px-[10px] rounded-full border border-[#0040C1] text-[#84ADFF] font-medium font-sans text-sm bg-[#0C111D] mr-3">
+                    New release!
+                </span>
 
-        <p class="text-slate-300 font-inter text-xl mt-4 lg:text-2xl lg:mt-8 lg:text-center">Save thousands. Break free from vendor lock. Replicate your app from development to production. All open source on GitHub.</p>
+                The Easiest Guide to Building Browser Extensions
 
-        <div class="flex flex-col md:flex-row items-center justify-center w-full mt-8">
-            <NuxtLink target="_blank" href="https://github.com/serversideup/spin/" class="rounded-lg bg-white flex w-full md:w-auto items-center justify-center md:justify-normal mb-5 md:mb-0 py-4 px-[22px] cursor-pointer text-[#151A1F] font-semibold text-lg mr-3">
-                <svg class="mr-[10px]" width="22" height="21" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.2826 1.99706C10.5131 1.53012 10.6284 1.29665 10.7848 1.22206C10.9209 1.15716 11.0791 1.15716 11.2152 1.22206C11.3716 1.29665 11.4869 1.53012 11.7174 1.99706L13.904 6.42703C13.9721 6.56488 14.0061 6.63381 14.0558 6.68732C14.0999 6.7347 14.1527 6.7731 14.2113 6.80037C14.2775 6.83117 14.3536 6.84229 14.5057 6.86452L19.397 7.57945C19.912 7.65474 20.1696 7.69238 20.2888 7.81818C20.3925 7.92764 20.4412 8.07804 20.4215 8.22752C20.3988 8.39933 20.2124 8.58093 19.8395 8.94413L16.3014 12.3902C16.1911 12.4976 16.136 12.5513 16.1004 12.6152C16.0689 12.6718 16.0487 12.734 16.0409 12.7983C16.0321 12.8709 16.0451 12.9467 16.0711 13.0985L16.9059 17.9659C16.994 18.4792 17.038 18.7359 16.9553 18.8882C16.8833 19.0208 16.7553 19.1137 16.607 19.1412C16.4366 19.1728 16.2061 19.0516 15.7451 18.8092L11.3724 16.5096C11.2361 16.4379 11.168 16.4021 11.0962 16.388C11.0327 16.3756 10.9673 16.3756 10.9038 16.388C10.832 16.4021 10.7639 16.4379 10.6276 16.5096L6.25491 18.8092C5.7939 19.0516 5.5634 19.1728 5.39296 19.1412C5.24467 19.1137 5.11671 19.0208 5.04472 18.8882C4.96199 18.7359 5.00601 18.4792 5.09406 17.9659L5.92887 13.0985C5.9549 12.9467 5.96791 12.8709 5.9591 12.7983C5.95131 12.734 5.9311 12.6718 5.89959 12.6152C5.86401 12.5513 5.80886 12.4976 5.69857 12.3902L2.16054 8.94413C1.78765 8.58093 1.6012 8.39933 1.57851 8.22752C1.55877 8.07804 1.60754 7.92764 1.71124 7.81818C1.83042 7.69238 2.08796 7.65474 2.60303 7.57945L7.4943 6.86452C7.64641 6.84229 7.72247 6.83117 7.7887 6.80037C7.84735 6.7731 7.90015 6.7347 7.94417 6.68732C7.99389 6.63381 8.02791 6.56488 8.09596 6.42703L10.2826 1.99706Z" stroke="#151A1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="ml-1" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.83333 8.00001H13.1667M13.1667 8.00001L8.5 3.33334M13.1667 8.00001L8.5 12.6667" stroke="#2970FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
+            </div>
+            <h1 class="mt-4 text-6xl font-sans font-medium text-[#F5F5F6] text-center max-w-6xl w-full mx-auto">Messaging in Web Extensions made easy. Batteries included.</h1>
+            <p class="mt-6 text-[#94969C] font-sans text-xl">Reduce headache and simplify the effort of keeping data in sync within your browser extension.</p>
+            <div class="flex items-center justify-center space-x-3 mt-12">
+                <NuxtLink href="https://github.com/serversideup/webext-bridge" target="_blank" class="flex items-center bg-[#161B26] rounded-lg border border-[#333741] px-6 py-4 text-[#CECFD2] shadow-sm font-sans font-semibold text-lg">
+                    <svg class="mr-3" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.2826 3.4533C11.5131 2.98637 11.6284 2.7529 11.7848 2.6783C11.9209 2.6134 12.0791 2.6134 12.2152 2.6783C12.3716 2.7529 12.4869 2.98637 12.7174 3.4533L14.904 7.88327C14.9721 8.02112 15.0061 8.09005 15.0558 8.14356C15.0999 8.19095 15.1527 8.22934 15.2113 8.25661C15.2775 8.28741 15.3536 8.29853 15.5057 8.32076L20.397 9.03569C20.912 9.11098 21.1696 9.14862 21.2888 9.27443C21.3925 9.38388 21.4412 9.53428 21.4215 9.68376C21.3988 9.85557 21.2124 10.0372 20.8395 10.4004L17.3014 13.8464C17.1911 13.9538 17.136 14.0075 17.1004 14.0715C17.0689 14.128 17.0487 14.1902 17.0409 14.2545C17.0321 14.3271 17.0451 14.403 17.0711 14.5547L17.9059 19.4221C17.994 19.9355 18.038 20.1922 17.9553 20.3445C17.8833 20.477 17.7553 20.57 17.607 20.5975C17.4366 20.6291 17.2061 20.5078 16.7451 20.2654L12.3724 17.9658C12.2361 17.8942 12.168 17.8583 12.0962 17.8443C12.0327 17.8318 11.9673 17.8318 11.9038 17.8443C11.832 17.8583 11.7639 17.8942 11.6276 17.9658L7.25491 20.2654C6.7939 20.5078 6.5634 20.6291 6.39296 20.5975C6.24467 20.57 6.11671 20.477 6.04472 20.3445C5.96199 20.1922 6.00601 19.9355 6.09406 19.4221L6.92887 14.5547C6.9549 14.403 6.96791 14.3271 6.9591 14.2545C6.95131 14.1902 6.9311 14.128 6.89959 14.0715C6.86401 14.0075 6.80886 13.9538 6.69857 13.8464L3.16054 10.4004C2.78765 10.0372 2.6012 9.85557 2.57851 9.68376C2.55877 9.53428 2.60754 9.38388 2.71124 9.27443C2.83042 9.14862 3.08796 9.11098 3.60303 9.03569L8.4943 8.32076C8.64641 8.29853 8.72247 8.28741 8.7887 8.25661C8.84735 8.22934 8.90015 8.19095 8.94417 8.14356C8.99389 8.09005 9.02791 8.02112 9.09596 7.88327L11.2826 3.4533Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
 
-                Star on GitHub
-            </NuxtLink>
+                    Star on GitHub
+                </NuxtLink>
 
-            <NuxtLink to="/docs" class="rounded-lg w-full md:w-auto justify-center md:justify-normal bg-[#1CE783] flex items-center py-4 px-[22px] cursor-pointer text-[#151A1F] font-semibold text-lg mr-3">
-                Get Started &rarr;
-            </NuxtLink>
+                <NuxtLink href="/docs" class="flex items-center bg-[#155EEF] rounded-lg border border-[#155EEF] px-6 py-4 text-white shadow-sm font-sans font-semibold text-lg">
+                    Get Started
+                    <svg class="ml-[10px]" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </NuxtLink>
+            </div>
         </div>
     </div>
 </template>
-
-<script setup>
-
-</script>

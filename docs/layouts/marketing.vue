@@ -1,5 +1,8 @@
 <template>
-    <div class="w-full flex flex-col scroll-smooth bg-[url('images/ui/background-pattern.svg')] bg-no-repeat min-h-screen bg-[#0C111D]">
+    <div class="w-full flex flex-col scroll-smooth bg-[url('images/ui/background-pattern.svg')] bg-no-repeat min-h-screen bg-[#0C111D]"
+        :style="{
+            backgroundPosition: 'top, center'
+        }">
         <Head>
             <Link rel="preconnect" href="https://fonts.googleapis.com"/>
             <Link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
