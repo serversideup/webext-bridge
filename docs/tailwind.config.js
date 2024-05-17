@@ -29,7 +29,7 @@ module.exports = {
                 link: '#3B82F6'
             },
             fontFamily: {
-                'inter': ['Inter', 'sans-serif']
+                'sans': ['Inter', 'sans-serif']
             },
             maxWidth: {
                 lg: '33rem',

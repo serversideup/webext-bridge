@@ -35,6 +35,48 @@
                                     <span class="group-hover:underline">Bugflow</span>
                             </NuxtLink>
 
+                            <NuxtLink
+                                @click="showMenu = false"
+                                :to="'https://selfhostpro.com'"
+                                class="flex items-center text-[12px] font-medium font-inter py-2 group">
+                                    <div class="w-3 h-3 flex items-center justify-center mr-2">
+                                        <svg width="195" height="195" viewBox="0 0 195 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="194.855" height="194.855" rx="42.6245" fill="url(#paint0_linear_11616_3)"/>
+                                        <g filter="url(#filter0_dii_11616_3)">
+                                        <path d="M162.886 31.9683C162.886 31.9683 113.723 31.8507 75.3932 70.1804C73.6235 71.9501 72.0826 73.8766 70.6875 75.87C63.8917 75.3266 53.4892 75.5041 48.1645 80.8323C35.7347 93.2621 31.5878 113.986 31.5878 113.986L58.9661 110.072V119.461L75.3932 135.889H84.7831L80.8688 163.267C80.8688 163.267 101.593 159.12 114.022 146.69C119.351 141.365 119.528 130.963 118.985 124.167C120.978 122.772 122.905 121.231 124.674 119.461C163.004 81.1318 162.886 31.9683 162.886 31.9683ZM119.199 64.7047C125.249 64.7047 130.15 69.6055 130.15 75.6561C130.15 81.7067 125.249 86.6074 119.199 86.6074C113.148 86.6074 108.247 81.7067 108.247 75.6561C108.247 69.6055 113.148 64.7047 119.199 64.7047ZM54.5813 124.916C52.5006 125.463 50.5287 126.509 48.9024 128.135C41.4227 135.615 42.614 152.23 42.614 152.23C42.614 152.23 59.1201 153.52 66.6984 145.942C68.3247 144.315 69.3699 142.333 69.9175 140.252L67.4149 137.749C67.1685 138.1 67.016 138.507 66.6984 138.819C61.3596 144.158 53.3514 141.493 53.3514 141.493C53.3514 141.493 50.6808 133.484 56.0251 128.146C56.3427 127.828 56.7334 127.681 57.0839 127.429L54.5813 124.916Z" fill="white"/>
+                                        </g>
+                                        <defs>
+                                        <filter id="filter0_dii_11616_3" x="14.8424" y="28.9237" width="161.745" height="161.745" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dx="-1.5223" dy="12.1784"/>
+                                        <feGaussianBlur stdDeviation="7.61151"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
+                                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11616_3"/>
+                                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11616_3" result="shape"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dx="1.14173" dy="-2.66403"/>
+                                        <feGaussianBlur stdDeviation="6.46978"/>
+                                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0.0333333 0 0 0 0 0.0333333 0 0 0 0 0.0333333 0 0 0 0.3 0"/>
+                                        <feBlend mode="normal" in2="shape" result="effect2_innerShadow_11616_3"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dx="-3.80575" dy="5.32806"/>
+                                        <feGaussianBlur stdDeviation="8.37266"/>
+                                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+                                        <feBlend mode="normal" in2="effect2_innerShadow_11616_3" result="effect3_innerShadow_11616_3"/>
+                                        </filter>
+                                        <linearGradient id="paint0_linear_11616_3" x1="-0.00105685" y1="97.1015" x2="155.893" y2="19.1672" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#0040C1"/>
+                                        <stop offset="1" stop-color="#155EEF"/>
+                                        </linearGradient>
+                                        </defs>
+                                        </svg>
+                                    </div>
+                                    <span class="group-hover:underline">SelfHost Pro</span>
+                            </NuxtLink>
+
                             <span class="font-inter font-bold text-black text-[14px] mt-2">Books</span>
                             <NuxtLink
                                 @click="showMenu = false"
