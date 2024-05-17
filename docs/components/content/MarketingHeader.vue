@@ -28,7 +28,6 @@
                 </nav>
             </div>
 
-
             <div class="flex items-center space-x-4">
                 <NuxtLink to="https://github.com/serversideup/webext-bridge" target="_blank" class="py-3 px-5 font-sans font-semibold text-[#94969C] hover:text-white flex items-center">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
@@ -47,8 +46,6 @@
 
                 </NuxtLink>
             </div>
-            
-
         </header>
 
     <!-- <GlobalMobileMenu

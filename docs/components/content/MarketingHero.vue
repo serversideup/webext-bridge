@@ -1,7 +1,7 @@
 <template>
-    <div class="w-full pt-24 mt-28">
+    <div class="w-full py-24 mt-28">
         <div class="flex flex-col items-center justify-center mx-auto w-full max-w-7xl">
-            <div class="flex items-center p-1 pr-[10px] rounded-full text-[#84ADFF] font-sans font-medium text-sm border border-[#0040C1] bg-[#026]">
+            <NuxtLink to="https://serversideup.net/building-multi-platform-browser-extensions/" class="flex items-center p-1 pr-[10px] rounded-full text-[#84ADFF] font-sans font-medium text-sm border border-[#0040C1] bg-[#026]">
                 <span class="py-[2px] px-[10px] rounded-full border border-[#0040C1] text-[#84ADFF] font-medium font-sans text-sm bg-[#0C111D] mr-3">
                     New release!
                 </span>
@@ -11,7 +11,7 @@
                 <svg class="ml-1" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3.83333 8.00001H13.1667M13.1667 8.00001L8.5 3.33334M13.1667 8.00001L8.5 12.6667" stroke="#2970FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-            </div>
+            </NuxtLink>
             <h1 class="mt-4 text-6xl font-sans font-medium text-[#F5F5F6] text-center max-w-6xl w-full mx-auto">Messaging in Web Extensions made easy. Batteries included.</h1>
             <p class="mt-6 text-[#94969C] font-sans text-xl">Reduce headache and simplify the effort of keeping data in sync within your browser extension.</p>
             <div class="flex items-center justify-center space-x-3 mt-12">
