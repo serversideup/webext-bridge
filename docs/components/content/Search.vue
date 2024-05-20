@@ -121,7 +121,7 @@ watchEffect(() => {
 /**
  * Event handler for opening the modal
  */
-const docsEventBus = useEventBus('spin-docs-event-bus');
+const docsEventBus = useEventBus('webext-bridge-docs-event-bus');
 const listener = ( event ) => {
     if( event == 'prompt-search' ) {
         show.value = true;
@@ -199,7 +199,7 @@ const search = async () => {
  * Builds the link text from the search result
  */
 const buildSearchResultTitle = (link) => {
-    let highlightedContent = link.content.replace(query.value, '<span class="bg-[#1CE783] text-white">'+query.value+'</span>');
+    let highlightedContent = link.content.replace(query.value, '<span class="bg-[#155EEF] text-white">'+query.value+'</span>');
 
     let title =  '<span class="text-[#E2E8F0]">'+( link.titles.length > 0  ? link.titles.join(' > ')+ ' > ' : ''  )+ link.title+ ' </span><span class="text-[10px] hidden md:inline">'+highlightedContent+'</span>';
     return title;

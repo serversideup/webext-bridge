@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex flex-col scroll-smooth bg-[url('images/ui/background-pattern.svg')] bg-no-repeat min-h-screen bg-[#0C111D]"
+    <div class="w-full flex flex-col scroll-smooth bg-[url('images/ui/background-pattern.svg')] bg-[length:410%] md:bg-auto bg-no-repeat min-h-screen bg-[#0C111D]"
         :style="{
             backgroundPosition: 'top, center'
         }">

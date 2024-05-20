@@ -1,10 +1,10 @@
 <template>
     <div class="w-full bg-[#151A1F]">
-        <div id="spin-follow-along" class="w-full max-w-7xl mx-auto flex flex-col px-4 py-16 md:px-8">
+        <div id="webext-bridge-follow-along" class="w-full max-w-7xl mx-auto flex flex-col px-4 py-16 md:px-8">
             <div class="w-full flex flex-col items-center justify-center rounded-2xl bg-[#1D252C] px-6 py-10 md:p-16">
                 <h2 class="font-sans text-4xl text-center text-[#F5F5F6] font-semibold">🚀 We're building in public</h2>
                 <div class="mt-5 text-center text-xl font-sans font-normal text-[#94969C]">Follow along and get updates delivered right to your inbox.</div>
-                <form action="https://app.convertkit.com/forms/6025750/subscriptions" class="seva-form formkit-form w-full" method="POST" data-sv-form="6025750" data-uid="d091df3366" data-format="inline" data-version="5" data-options='{"settings":{"after_subscribe":{"action":"message","success_message":"Success! Now check your email to confirm your subscription.","redirect_url":""},"analytics":{"google":null,"fathom":null,"facebook":null,"segment":null,"pinterest":null,"sparkloop":null,"googletagmanager":null},"modal":{"trigger":"timer","scroll_percentage":null,"timer":5,"devices":"all","show_once_every":15},"powered_by":{"show":false,"url":"https://convertkit.com/features/forms?utm_campaign=poweredby&amp;utm_content=form&amp;utm_medium=referral&amp;utm_source=dynamic"},"recaptcha":{"enabled":false},"return_visitor":{"action":"show","custom_content":""},"slide_in":{"display_in":"bottom_right","trigger":"timer","scroll_percentage":null,"timer":5,"devices":"all","show_once_every":15},"sticky_bar":{"display_in":"top","trigger":"timer","scroll_percentage":null,"timer":5,"devices":"all","show_once_every":15}},"version":"5"}' min-width="400 500 600 700 800">
+                <form action="https://app.convertkit.com/forms/6597528/subscriptions" class="seva-form formkit-form w-full" method="POST" data-sv-form="6597528" data-uid="d091df3366" data-format="inline" data-version="5" data-options='{"settings":{"after_subscribe":{"action":"message","success_message":"Success! Now check your email to confirm your subscription.","redirect_url":""},"analytics":{"google":null,"fathom":null,"facebook":null,"segment":null,"pinterest":null,"sparkloop":null,"googletagmanager":null},"modal":{"trigger":"timer","scroll_percentage":null,"timer":5,"devices":"all","show_once_every":15},"powered_by":{"show":false,"url":"https://convertkit.com/features/forms?utm_campaign=poweredby&amp;utm_content=form&amp;utm_medium=referral&amp;utm_source=dynamic"},"recaptcha":{"enabled":false},"return_visitor":{"action":"show","custom_content":""},"slide_in":{"display_in":"bottom_right","trigger":"timer","scroll_percentage":null,"timer":5,"devices":"all","show_once_every":15},"sticky_bar":{"display_in":"top","trigger":"timer","scroll_percentage":null,"timer":5,"devices":"all","show_once_every":15}},"version":"5"}' min-width="400 500 600 700 800">
                     <div data-style="clean">
                         <ul
                             class="formkit-alert formkit-alert-error"
@@ -26,7 +26,7 @@
                                 </div>
                                 <button
                                     data-element="submit"
-                                    class="formkit-submit formkit-submit w-full md:w-auto font-sans text-base font-semibold py-[14px] px-[18px] rounded-lg border border-[#1CE783] bg-[#1CE783] text-[#151A1F]">
+                                    class="formkit-submit formkit-submit w-full md:w-auto font-sans text-base font-semibold py-[14px] px-[18px] rounded-lg border border-[#155EEF] bg-[#155EEF] text-[#151A1F]">
 
                                     <span class="">Subscribe</span>
                                 </button>
@@ -76,7 +76,7 @@
 
                 <NuxtLink 
                     class="block w-full p-[1px] hover:rounded-lg hover:bg-gradient-to-r hover:from-[#1CE783] hover:to-[#00d4ff]"
-                    :to="'https://github.com/serversideup/spin'" target="_blank">
+                    :to="'https://github.com/serversideup/webext-bridge'" target="_blank">
                         <div class="flex flex-col bg-[#151A1F] rounded-lg p-4 h-full">
                             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M14 0.0395508C6.265 0.0395508 0 6.30455 0 14.0396C0 20.2346 4.0075 25.4671 9.5725 27.3221C10.2725 27.4446 10.535 27.0246 10.535 26.6571C10.535 26.3246 10.5175 25.2221 10.5175 24.0496C7 24.6971 6.09 23.1921 5.81 22.4046C5.6525 22.0021 4.97 20.7596 4.375 20.4271C3.885 20.1646 3.185 19.5171 4.3575 19.4996C5.46 19.4821 6.2475 20.5146 6.51 20.9346C7.77 23.0521 9.7825 22.4571 10.5875 22.0896C10.71 21.1796 11.0775 20.5671 11.48 20.2171C8.365 19.8671 5.11 18.6596 5.11 13.3046C5.11 11.7821 5.6525 10.5221 6.545 9.54205C6.405 9.19205 5.915 7.75705 6.685 5.83205C6.685 5.83205 7.8575 5.46455 10.535 7.26705C11.655 6.95205 12.845 6.79455 14.035 6.79455C15.225 6.79455 16.415 6.95205 17.535 7.26705C20.2125 5.44705 21.385 5.83205 21.385 5.83205C22.155 7.75705 21.665 9.19205 21.525 9.54205C22.4175 10.5221 22.96 11.7646 22.96 13.3046C22.96 18.6771 19.6875 19.8671 16.5725 20.2171C17.08 20.6546 17.5175 21.4946 17.5175 22.8071C17.5175 24.6796 17.5 26.1846 17.5 26.6571C17.5 27.0246 17.7625 27.4621 18.4625 27.3221C21.2418 26.3838 23.6568 24.5976 25.3677 22.2149C27.0786 19.8322 27.9993 16.9729 28 14.0396C28 6.30455 21.735 0.0395508 14 0.0395508Z" fill="white"/>

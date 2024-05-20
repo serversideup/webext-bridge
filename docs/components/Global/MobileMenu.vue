@@ -1,6 +1,6 @@
 <template>
     <transition name="slide-in-top">
-        <div id="mobile-menu" v-show="show" class="px-6 pt-7 right-0 bottom-0 bg-[#1D252C] w-full fixed flex flex-col z-50 top-[112px] overflow-y-scroll">
+        <div id="mobile-menu" v-show="show" class="px-6 pt-7 right-0 bottom-0 bg-[#0C111D] w-full fixed flex flex-col z-50 top-[99px] overflow-y-scroll">
             <button type="button" 
                 @click="promptSearch"
                 class="flex items-center font-inter font-bold text-slate-300 text-xl mb-6">
@@ -54,7 +54,7 @@
                 <img class="ml-[10px]" src="/images/icons/heart.svg"/>
             </NuxtLink>
 
-            <NuxtLink :to="'/docs'" class="flex items-center justify-center w-[136px] py-2 font-bold font-inter text-white rounded-lg bg-[#1CE783] text-sm mb-12 hover:bg-[#1CE783]">
+            <NuxtLink :to="'/docs'" class="flex items-center justify-center w-[136px] py-2 font-bold font-inter text-white rounded-lg bg-[#155EEF] text-sm mb-12 hover:bg-[#155EEF]">
                 Get Started &rarr;
             </NuxtLink>
 
@@ -76,7 +76,7 @@
                                 
                                 <span class="truncate"
                                     :class="{
-                                        '-ml-[17px] pl-[17px] border-l border-[#1CE783]': navigation._path === route.path,
+                                        '-ml-[17px] pl-[17px] border-l border-[#155EEF]': navigation._path === route.path,
                                     }">{{ navigation.title }}</span>
                                 
                         </NuxtLink>
@@ -102,7 +102,7 @@
                                 
                                 <span class="pl-4 truncate"
                                     :class="{
-                                        '-ml-[1px] border-l border-[#1CE783]': link._path === route.path
+                                        '-ml-[1px] border-l border-[#155EEF]': link._path === route.path
                                     }">{{ link.title }}</span>
                                 
                         </NuxtLink>
@@ -122,7 +122,7 @@ const resetOverflow = () => {
     document.body.classList.remove('overflow-y-hidden');
 }
 
-const docsEventBus = useEventBus('spin-docs-event-bus');
+const docsEventBus = useEventBus('webext-bridge-docs-event-bus');
 const promptSearch = () => {
     docsEventBus.emit('prompt-search');
     docsEventBus.emit('hide-mobile-menu');

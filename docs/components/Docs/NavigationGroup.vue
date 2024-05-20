@@ -23,7 +23,7 @@
                                 
                                 <span class="pl-4 truncate"
                                     :class="{
-                                        '-ml-[1px] border-l border-[#1CE783]': link._path === route.path
+                                        '-ml-[1px] border-l border-[#155EEF]': link._path === route.path
                                     }">{{ link.title }}</span>
                                 
                         </NuxtLink>

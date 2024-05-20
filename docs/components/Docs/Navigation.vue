@@ -22,7 +22,7 @@
                                 }">
                                     <span class="pl-4 truncate"
                                     :class="{
-                                        '-ml-[1px] border-l border-[#1CE783]': navigation[0]._path === route.path
+                                        '-ml-[1px] border-l border-[#155EEF]': navigation[0]._path === route.path
                                     }">{{ navigation[0].title }}</span>   
                             </NuxtLink>
                         </li>

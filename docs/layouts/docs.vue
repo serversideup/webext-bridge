@@ -1,14 +1,14 @@
 <template>
-    <div class="w-full min-h-screen bg-[#1D252C]">
+    <div class="w-full min-h-screen bg-[#0C111D]">
         <Head>
             <Link rel="preconnect" href="https://fonts.googleapis.com"/>
             <Link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
             <Link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-            <Link rel="apple-touch-icon" sizes="180x180" :href="( basePath != '/' ? basePath : '' )+'/images/favicon/apple-touch-icon.png'"/>
-            <Link rel="icon" type="image/png" sizes="32x32" :href="( basePath != '/' ? basePath : '' )+'/images/favicon/favicon-32x32.png'"/>
-            <Link rel="icon" type="image/png" sizes="16x16" :href="( basePath != '/' ? basePath : '' )+'/images/favicon/favicon-16x16.png'"/>
-            <Link rel="manifest" :href="( basePath != '/' ? basePath : '' )+'/images/favicon/site.webmanifest'"/>
-            <Link rel="mask-icon" :href="( basePath != '/' ? basePath : '' )+'/images/favicon/safari-pinned-tab.svg'" color="#5bbad5"/>
+            <Link rel="apple-touch-icon" sizes="180x180" :href="( basePath != '/' ? basePath : '' )+'/apple-touch-icon.png'"/>
+            <Link rel="icon" type="image/png" sizes="32x32" :href="( basePath != '/' ? basePath : '' )+'/favicon-32x32.png'"/>
+            <Link rel="icon" type="image/png" sizes="16x16" :href="( basePath != '/' ? basePath : '' )+'/favicon-16x16.png'"/>
+            <Link rel="manifest" :href="( basePath != '/' ? basePath : '' )+'/site.webmanifest'"/>
+            <Link rel="mask-icon" :href="( basePath != '/' ? basePath : '' )+'/safari-pinned-tab.svg'" color="#5bbad5"/>
             <Meta name="msapplication-TileColor" content="#da532c"/>
             <Meta name="theme-color" content="#ffffff"/>
         </Head>
@@ -58,7 +58,7 @@ useSeoMeta({
     ogLocale: 'en_US',
     ogUrl: domain+basePath+route.path,
     ogType: 'website',
-    ogSiteName: 'Server Side Up - Spin',
+    ogSiteName: 'Server Side Up - Webext Bridge',
     ogTitle: page.value?.head.title,
     ogDescription: page.value.description,
     twitterCard: 'summary_large_image',

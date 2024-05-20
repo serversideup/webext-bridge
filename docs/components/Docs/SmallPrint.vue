@@ -8,7 +8,7 @@
                 <span class="sr-only">Twitter</span>
                 <IconsSocialTwitter class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-500"/>
             </NuxtLink>
-            <NuxtLink :to="'https://github.com/serversideup/spin'" class="group">
+            <NuxtLink :to="'https://github.com/serversideup/webext-bridge'" class="group">
                 <span class="sr-only">GitHub</span>
                 <IconsSocialGitHub class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-500"/>
             </NuxtLink>
