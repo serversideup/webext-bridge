@@ -7,7 +7,7 @@
             <div class="flex items-start border-b border-[#1F242F] pb-8">
                 <div class="flex flex-col flex-1">
                     <h3 class="font-sans font-medium text-lg md:text-xl text-[#F5F5F6]">Who started this project?</h3>
-                    <p class="mt-2 text-[#94969C] font-sans" v-show="showWhoStarted">This project was originally started by <a href="https://github.com/zikaari" target="_blank" class="underline">Neek Sandhu (@zikaari)</a> in 2017. Unfortunately time became a constraint and in January 2024, the project was graciously transferred to Server Side Up to be maintained. We're very grateful for Neek Sandhu’s contributions and we're excited to carry the torch forward. 🤝</p>
+                    <p class="mt-2 text-[#94969C] font-sans" v-show="showWhoStarted">This project was originally started by <a href="https://github.com/zikaari" target="_blank" class="underline">Neek Sandhu (@zikaari)</a> in 2017. Unfortunately time became a constraint and in January 2024, the project was graciously transferred to Server Side Up to be maintained. We're very grateful for Neek Sandhu's contributions and we're excited to carry the torch forward. 🤝</p>
                 </div>
                 <div class="flex shrink-0 ml-6 w-6">
                     <button @click="showWhoStarted = !showWhoStarted" class="cursor-pointer">
