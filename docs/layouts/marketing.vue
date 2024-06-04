@@ -54,7 +54,7 @@ useSeoMeta({
     ogUrl: domain+basePath+route.path,
     ogType: 'website',
     ogSiteName: 'Server Side Up - Webext-Bridge',
-    ogImage: domain+basePath+'/images/social-image.jpg',
+    ogImage: domain+basePath+'/images/seo/og-image.png',
     ogImageWidth: 1200,
     ogImageHeight: 630,
     ogImageType: 'image/png',
@@ -62,7 +62,7 @@ useSeoMeta({
     ogTitle: 'Server Side Up - Webext-Bridge',
     twitterCard: 'summary_large_image',
     twitterDescription: 'Messaging in Web Extensions made easy. Reduce headache and simplify the effort of keeping data in sync within your browser extension.',
-    twitterImage: domain+basePath+'/images/social-image.jpg',
+    twitterImage: domain+basePath+'/images/seo/og-image.png',
     twitterSite: '@serversideup',
     twitterTitle: 'Server Side Up - Webext-Bridge'
 })

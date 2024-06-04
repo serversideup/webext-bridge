@@ -23,7 +23,7 @@
             <div class="flex items-start border-b border-[#1F242F] pb-8 mt-6">
                 <div class="flex flex-col flex-1">
                     <h3 class="font-sans font-medium text-lg md:text-xl text-[#F5F5F6]">Where can I get help?</h3>
-                    <p class="mt-2 text-[#94969C] font-sans" v-show="showGetHelp"></p>
+                    <p class="mt-2 text-[#94969C] font-sans" v-show="showGetHelp">If you have a quick question, feel free to throw it in our <a href="https://github.com/serversideup/webext-bridge/discussions" target="_blank" class="underline">GitHub Discussions</a> or hop on our <a href="https://serversideup.net/discord" target="_blank" class="underline">Discord community</a>. For more advanced questions and custom development, we do offer <a href="https://serversideup.net/get-help/" class="underline">professional support</a>.</p>
                 </div>
                 <div class="flex shrink-0 ml-6 w-6">
                     <button @click="showGetHelp = !showGetHelp" class="cursor-pointer">
@@ -39,7 +39,7 @@
             <div class="flex items-start border-b border-[#1F242F] pb-8 mt-6">
                 <div class="flex flex-col flex-1">
                     <h3 class="font-sans font-medium text-lg md:text-xl text-[#F5F5F6]">Do I need to buy the book to use this software?</h3>
-                    <p class="mt-2 text-[#94969C] font-sans" v-show="showBuyBook"></p>
+                    <p class="mt-2 text-[#94969C] font-sans" v-show="showBuyBook">Nope! This is a 100% free and open-source product that you can implement into your web extensions. If you are looking for a full multi-platform web extension template that includes the webext-bridge package and a whole bunch of other helpful tutorials, <a href="https://serversideup.net/building-multi-platform-browser-extensions/" target="_blank" class="underline">check out our book</a>!</p>
                 </div>
                 <div class="flex shrink-0 ml-6 w-6">
                     <button @click="showBuyBook = !showBuyBook" class="cursor-pointer">
@@ -55,7 +55,7 @@
             <div class="flex items-start border-b border-[#1F242F] pb-8 mt-6">
                 <div class="flex flex-col flex-1">
                     <h3 class="font-sans font-medium text-lg md:text-xl text-[#F5F5F6]">How can I help this project?</h3>
-                    <p class="mt-2 text-[#94969C] font-sans" v-show="showGetHelp"></p>
+                    <p class="mt-2 text-[#94969C] font-sans" v-show="showGetHelp">We are totally open to PRs, issues, and ideas! Feel free to visit our <a href="https://github.com/serversideup/webext-bridge" target="_blank" class="underline">GitHub repository</a> and contribute what you think would make this package better!</p>
                 </div>
                 <div class="flex shrink-0 ml-6 w-6">
                     <button @click="showGetHelp = !showGetHelp" class="cursor-pointer">
