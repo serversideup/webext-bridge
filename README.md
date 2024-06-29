@@ -107,7 +107,7 @@ Create `shim.d.ts` file with the following content and make sure it's been inclu
 ```ts
 // shim.d.ts
 
-import { ProtocolWithReturn } from "webext-bridge";
+import type { ProtocolWithReturn } from "webext-bridge";
 
 declare module "webext-bridge" {
   export interface ProtocolMap {
