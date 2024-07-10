@@ -96,7 +96,7 @@
             <div class="flex flex-col items-center justify-center my-16">
                 <span class="font-lato text-white mb-4">⚡️ Powered by:</span>
                 <NuxtLink :to="'https://serversideup.net'">
-                    <img src="/images/logos/server-side-up-footer.svg"/>
+                    <!-- <img src="/images/logos/server-side-up-footer.svg"/> -->
                 </NuxtLink>
             </div>
         </section>
