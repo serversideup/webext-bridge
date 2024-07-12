@@ -1,5 +1,5 @@
 <p align="center">
-		<img src="./.github/header.png" width="1200" alt="webext-bridge Header" />
+		<a href="https://serversideup.net/open-source/webext-bridge/"><img src="./.github/header.png" width="1200" alt="webext-bridge Header" /></a>
 </p>
 <p align="center">
 	<a href="https://actions-badge.atrox.dev/serversideup/webext-bridge/goto?ref=main"><img alt="Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fserversideup%2Fwebext-bridge%2Fbadge%3Fref%3Dmain&style=flat" /></a>
