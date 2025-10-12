@@ -30,31 +30,38 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     },
     "./background": {
       "import": "./dist/background.js",
-      "require": "./dist/background.cjs"
+      "require": "./dist/background.cjs",
+      "types": "./dist/background.d.ts"
     },
     "./content-script": {
       "import": "./dist/content-script.js",
-      "require": "./dist/content-script.cjs"
+      "require": "./dist/content-script.cjs",
+      "types": "./dist/content-script.d.ts"
     },
     "./devtools": {
       "import": "./dist/devtools.js",
-      "require": "./dist/devtools.cjs"
+      "require": "./dist/devtools.cjs",
+      "types": "./dist/devtools.d.ts"
     },
     "./options": {
       "import": "./dist/options.js",
-      "require": "./dist/options.cjs"
+      "require": "./dist/options.cjs",
+      "types": "./dist/options.d.ts"
     },
     "./popup": {
       "import": "./dist/popup.js",
-      "require": "./dist/popup.cjs"
+      "require": "./dist/popup.cjs",
+      "types": "./dist/popup.d.ts"
     },
     "./window": {
       "import": "./dist/window.js",
-      "require": "./dist/window.cjs"
+      "require": "./dist/window.cjs",
+      "types": "./dist/window.d.ts"
     }
   },
   "typesVersions": {
