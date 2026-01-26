@@ -119,7 +119,7 @@ export const createEndpointRuntime = (
 
           if (err && !noHandlerFoundError)
             // eslint-disable-next-line no-unsafe-finally
-            throw reply
+            throw err
         }
       }
 
