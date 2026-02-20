@@ -7,6 +7,7 @@ export type RuntimeContext =
   | 'options'
   | 'content-script'
   | 'window'
+  | 'sidepanel'
 
 export interface Endpoint {
   context: RuntimeContext
