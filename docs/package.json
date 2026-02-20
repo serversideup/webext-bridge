@@ -20,10 +20,10 @@
     "@tailwindcss/typography": "^0.5.13",
     "@vueuse/core": "^10.9.0",
     "@vueuse/nuxt": "^10.9.0",
-    "nuxt": "^3.11.2",
-    "nuxt-og-image": "^3.0.0-rc.53",
-    "nuxt-site-config": "^2.2.12",
-    "nuxt-site-config-kit": "^2.2.12",
+    "nuxt": "3.11.2",
+    "nuxt-og-image": "3.0.0-rc.53",
+    "nuxt-site-config": "2.2.12",
+    "nuxt-site-config-kit": "2.2.12",
     "sitemap": "^7.1.1"
   }
 }
