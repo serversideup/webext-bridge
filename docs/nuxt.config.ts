@@ -63,7 +63,7 @@ export default defineNuxtConfig({
     },
 
     ogImage: {
-        componentDirs: ['~/components/Global/OgImage'],
+        componentDirs: ['Global/OgImage'],
     },
 
     plausible: {
