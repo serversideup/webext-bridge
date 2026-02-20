@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <header class="flex items-center justify-between w-full mx-auto px-4 md:px-8 py-3" :class="{ 'fixed top-[43px]': fixed, 'backdrop-blur': bgOpacity }">
+        <header class="flex items-center justify-between w-full mx-auto px-4 md:px-8 py-3" :class="{ 'backdrop-blur bg-[#0C111D]/75': bgOpacity }">
             <div class="flex items-center">
                 <NuxtLink to="/" class="mr-4">
                     <img src="/images/logos/webext-bridge-horizontal-logo.svg" alt="WebExt-Bridge" class="h-8"/>

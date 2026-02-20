@@ -16,10 +16,12 @@
             <meta name="theme-color" content="#ffffff">
         </Head>
         
-        <ProjectSwitcherBar />
+        <div class="sticky top-0 z-50">
+            <ProjectSwitcherBar />
 
-        <MarketingHeader
-            :fixed="true"/>
+            <MarketingHeader
+                :fixed="false"/>
+        </div>
             
         <div class="w-full flex flex-col">
             <slot></slot>
