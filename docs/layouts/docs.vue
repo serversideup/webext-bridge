@@ -13,7 +13,7 @@
             <Meta name="theme-color" content="#ffffff"/>
         </Head>
 
-        <GlobalServerSideUp/>
+        <ProjectSwitcherBar />
 
         <MarketingHeader/>
 
@@ -41,6 +41,8 @@
 </template>
 
 <script setup>
+import { ProjectSwitcherBar } from '@serversideup/project-switcher-bar'
+
 const route = useRoute();
 const { basePath, domain } = useRuntimeConfig().public;
 const { page } = useContent();

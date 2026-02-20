@@ -16,8 +16,7 @@
             <meta name="theme-color" content="#ffffff">
         </Head>
         
-        <GlobalServerSideUp
-            :fixed="true"/>
+        <ProjectSwitcherBar />
 
         <MarketingHeader
             :fixed="true"/>
@@ -31,6 +30,8 @@
 </template>
 
 <script setup>
+import { ProjectSwitcherBar } from '@serversideup/project-switcher-bar'
+
 useHead({
     htmlAttrs: {
         lang: 'en'
