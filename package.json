@@ -1,6 +1,7 @@
 {
   "name": "webext-bridge",
   "version": "6.0.1",
+  "types": "./dist/index.d.ts",
   "description": "Messaging in Web Extensions made easy. Out of the box.",
   "keywords": [
     "chrome",
