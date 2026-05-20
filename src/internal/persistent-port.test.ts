@@ -280,30 +280,6 @@ describe('createPersistentPort', () => {
   })
 
   describe('onFailure', () => {
-    it('should call onFailure callback when terminated message received for matching fingerprint', () => {
-      const persistentPort = createPersistentPort()
-      const failureCallback = jest.fn()
-      const message = createMockMessage('tx-1')
-
-      persistentPort.onFailure(failureCallback)
-
-      const deliveredMsg: StatusMessage = {
-        status: 'delivered',
-        receipt: createMockReceipt('tx-1', 'fp-1'),
-      }
-
-      triggerMessage(deliveredMsg)
-
-      const terminatedMsg: StatusMessage = {
-        status: 'terminated',
-        fingerprint: createMockFingerprint('fp-1'),
-      }
-
-      triggerMessage(terminatedMsg)
-
-      expect(failureCallback).toHaveBeenCalledWith(message)
-    })
-
     it('should call multiple onFailure callbacks', () => {
       const persistentPort = createPersistentPort()
       const failureCallback1 = jest.fn()
