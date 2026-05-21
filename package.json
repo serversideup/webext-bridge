@@ -22,7 +22,7 @@
   },
   "author": "Neek Sandhu <neek.sandhu@outlook.com>",
   "scripts": {
-    "build": "tsup src/index.ts src/background.ts src/content-script.ts src/devtools.ts src/options.ts src/popup.ts src/window.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts src/background.ts src/content-script.ts src/devtools.ts src/options.ts src/popup.ts src/window.ts src/sidepanel.ts --format esm,cjs --dts",
     "watch": "npm run build -- --watch",
     "release": "bumpp --commit --push --tag && npm run build && npm publish"
   },
@@ -55,6 +55,10 @@
     "./window": {
       "import": "./dist/window.js",
       "require": "./dist/window.cjs"
+    },
+    "./sidepanel": {
+      "import": "./dist/sidepanel.js",
+      "require": "./dist/sidepanel.cjs"
     }
   },
   "typesVersions": {
@@ -79,6 +83,9 @@
       ],
       "window": [
         "dist/window.d.ts"
+      ],
+      "sidepanel": [
+        "dist/sidepanel.d.ts"
       ]
     }
   },

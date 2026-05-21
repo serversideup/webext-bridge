@@ -240,6 +240,23 @@ browser.runtime.onConnect.addListener((incomingPort) => {
     frameId: incomingPort.sender.frameId,
   })
 
+  // For sidepanel, popup, options and devtools, we need the tab ID of the current tab
+  if (['sidepanel', 'popup', 'options', 'devtools'].includes(parseEndpoint(connArgs.endpointName).context)) {
+    browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+      if (tabs[0]) {
+        const activeTabId = tabs[0].id
+        // Update the endpoint name with the active tab ID for sidepanel
+        if (parseEndpoint(connArgs.endpointName).context === 'sidepanel' &&
+            parseEndpoint(connArgs.endpointName).tabId == null) {
+          connArgs.endpointName = formatEndpoint({
+            context: 'sidepanel',
+            tabId: activeTabId,
+          })
+        }
+      }
+    })
+  }
+
   // literal tab id in case of content script, however tab id of inspected page in case of devtools context
   const { tabId: linkedTabId, frameId: linkedFrameId } = parseEndpoint(
     connArgs.endpointName,
