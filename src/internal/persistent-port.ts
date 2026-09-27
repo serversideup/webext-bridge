@@ -87,24 +87,42 @@ export const createPersistentPort = (name = '') => {
   }
 
   const connect = () => {
-    port = browser.runtime.connect({
-      name: encodeConnectionArgs({
-        endpointName: name,
-        fingerprint,
-      }),
-    })
-    port.onMessage.addListener(handleMessage)
-    port.onDisconnect.addListener(connect)
+    // Check if extension context is still valid before connecting
+    // If runtime.id is undefined, the extension has been invalidated
+    if (!browser.runtime?.id) {
+      return
+    }
+    try {
+      port = browser.runtime.connect({
+        name: encodeConnectionArgs({
+          endpointName: name,
+          fingerprint,
+        }),
+      })
+      port.onMessage.addListener(handleMessage)
+      port.onDisconnect.addListener(() => {
+        // Check chrome.runtime.lastError to prevent "Unchecked runtime.lastError" warning
+        const lastError = browser.runtime.lastError
+        // Only reconnect if extension context is still valid
+        if (browser.runtime?.id) {
+          connect()
+        }
+      })
 
-    PortMessage.toBackground(port, {
-      type: 'sync',
-      pendingResponses: pendingResponses.entries(),
-      pendingDeliveries: [
-        ...new Set(
-          undeliveredQueue.map(({ resolvedDestination }) => resolvedDestination),
-        ),
-      ],
-    })
+      PortMessage.toBackground(port, {
+        type: 'sync',
+        pendingResponses: pendingResponses.entries(),
+        pendingDeliveries: [
+          ...new Set(
+            undeliveredQueue.map(({ resolvedDestination }) => resolvedDestination),
+          ),
+        ],
+      })
+    }
+    catch (e) {
+      // Connection failed - extension context likely invalidated
+      // Don't retry to prevent error spam
+    }
   }
 
   connect()
