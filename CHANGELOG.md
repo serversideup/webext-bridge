@@ -15,7 +15,7 @@ bit of import restructring. The API behaviour is mostly unchanged, with just min
   for a script that'll be running in the Window context. Learn more about the change [here](https://github.com/zikaari/crx-bridge/issues/11).
 - `setNamespace` is not available in any context except `window`, and `allowWindowMessaging` is not available in any context except `content-script`.
 - `getCurrentContext` export has been removed.
-- `isInternalEndpoint` returns `true` for some new contexts. In summary it'll be `true` for `background`, `content-script`, `devtools`, `popup`, and `options`.
+- `isInternalEndpoint` returns `true` for some new contexts. In summary it'll be `true` for `background`, `content-script`, `devtools`, `offscreen`, `popup`, and `options`.
 - For messages sent from `background`, message queuing feature can no longer be trusted due to manifest v3 terminating the service worker runtime after certain time. The queue of messages
   sent from `background` will be disposed off along with the termination of the said service worker. Queuing still works for messages sent from all other contexts.
 
